@@ -1,3 +1,5 @@
+package program;
+
 public class DataLine {
     private double[] line;
     private String lineString;
@@ -16,6 +18,14 @@ public class DataLine {
 
     public double[] getLine() {
         return line;
+    }
+
+    public double[] getX() {
+        double[] result = new double[line.length - 1];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = line[i];
+        }
+        return result;
     }
 
     @Override

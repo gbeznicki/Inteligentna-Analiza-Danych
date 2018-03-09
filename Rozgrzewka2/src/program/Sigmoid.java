@@ -17,7 +17,7 @@ public class Sigmoid {
         return result;
     }
 
-    public double calcSigmoid(double x) {
+    public static double calcSigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
     }
 }

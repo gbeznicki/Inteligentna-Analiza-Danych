@@ -2,17 +2,18 @@ package program;
 
 public class Sigmoid {
 
-    private DataLine dataLine;
+    private double[] x;
+    private double[] weights;
 
-    public Sigmoid(DataLine dataLine) {
-        this.dataLine = dataLine;
+    public Sigmoid(double[] x, double[] weights) {
+        this.x = x;
+        this.weights = weights;
     }
 
     public double calcSigmoidForVector() {
         double result = 0.0;
-        double[] xVector = dataLine.getVectorX();
-        for (int i = 0; i < xVector.length; i++) {
-            result += calcSigmoid(xVector[i]);
+        for (int i = 0; i < x.length; i++) {
+            result += calcSigmoid(x[i]);
         }
         return result;
     }

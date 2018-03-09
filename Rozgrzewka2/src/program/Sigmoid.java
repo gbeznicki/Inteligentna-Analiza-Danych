@@ -10,7 +10,7 @@ public class Sigmoid {
 
     public double calcSigmoidForVector() {
         double result = 0.0;
-        double[] xVector = dataLine.getX();
+        double[] xVector = dataLine.getVectorX();
         for (int i = 0; i < xVector.length; i++) {
             result += calcSigmoid(xVector[i]);
         }

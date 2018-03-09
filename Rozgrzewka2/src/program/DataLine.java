@@ -20,12 +20,16 @@ public class DataLine {
         return line;
     }
 
-    public double[] getX() {
+    public double[] getVectorX() {
         double[] result = new double[line.length - 1];
         for (int i = 0; i < result.length; i++) {
             result[i] = line[i];
         }
         return result;
+    }
+
+    public double getY() {
+        return line[line.length - 1];
     }
 
     @Override

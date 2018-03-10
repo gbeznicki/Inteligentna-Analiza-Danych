@@ -14,5 +14,17 @@ public class Main {
         for (DataLine dl : dataLines) {
             System.out.println(dl);
         }
+        Approximator a = new Approximator(dataLines);
+        double[] weights = a.getWeights();
+        for (int i = 0; i < weights.length; i++) {
+            System.out.println("w" + i + " = " + weights[i]);
+        }
+        a.learn();
+        weights = a.getWeights();
+        for (int i = 0; i < weights.length; i++) {
+            System.out.println("w" + i + " = " + weights[i]);
+        }
+        OutputWriter ow = new OutputWriter(weights, outputFileName);
+        ow.saveToFile();
     }
 }

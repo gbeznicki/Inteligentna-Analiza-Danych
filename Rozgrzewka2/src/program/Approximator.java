@@ -22,7 +22,7 @@ public class Approximator {
         precision = 1e-5;
         lastError = 0.0;
         maxSteps = 1000;
-        maxError = 0.2;
+        maxError = 0.3;
         weights = new double[n + 1];
         do {
             for (int i = 0; i < weights.length; i++) {
@@ -46,17 +46,6 @@ public class Approximator {
     public double singleError(double output, double desired) {
         return output - desired;
     }
-
-//    public double overallError() {
-//        double errorSum = 0.0;
-//        for (int i = 0; i < dataLines.size(); i++) {
-//            double[] x = dataLines.get(i).getVectorX();
-//            double y = dataLines.get(i).getY();
-//            double output = sigmoid(x);
-//            errorSum += singleError(output, y);
-//        }
-//        return errorSum;
-//    }
 
     public double singleSquareError(double output, double desired) {
         return singleError(output, desired) * singleError(output, desired);

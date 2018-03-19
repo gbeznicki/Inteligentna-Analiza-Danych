@@ -1,11 +1,22 @@
+import java.util.Random;
+
 public class Neuron {
 
-    double[] weights;
-    int numberOfInputs;
+    private double[] weights;
+    private int numberOfInputs;
+    private double learningRate;
 
     public Neuron(int numberOfInputs) {
         this.numberOfInputs = numberOfInputs;
         weights = new double[numberOfInputs];
+        learningRate = 0.1;
+        initializeWeights();
+    }
+
+    private void initializeWeights() {
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = new Random().nextDouble() * 2 - 1;
+        }
     }
 
     public double activate(double[] x) {
@@ -20,5 +31,13 @@ public class Neuron {
         for (int i = 0; i < weights.length; i++) {
             weights[i] += deltaWeights[i];
         }
+    }
+
+    public double[] getWeights() {
+        return weights;
+    }
+
+    public double getLearningRate() {
+        return learningRate;
     }
 }

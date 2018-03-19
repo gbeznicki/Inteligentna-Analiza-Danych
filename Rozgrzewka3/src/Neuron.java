@@ -40,4 +40,8 @@ public class Neuron {
     public double getLearningRate() {
         return learningRate;
     }
+
+    public int getNumberOfInputs() {
+        return numberOfInputs;
+    }
 }

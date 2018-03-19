@@ -1,40 +1,62 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LastLayer extends Layer {
     private Neuron neuron;
-//    private double[] b;
+    //    private double[] b;
     private double[] deltaWeights;
-    private List<double[]> listOfX;
-    private List<Double> listOfV;
+    private double[] x;
+    private double y;
+//    private double[] b;
 
-    public LastLayer(int numberOfNeurons, int numberOfInputs) {
+    public LastLayer() {
 //        super(numberOfNeurons, numberOfInputs);
         super();
 //        b = new double[numberOfInputs];
-        listOfX = new ArrayList<>();
+        neuron = new Neuron(3);
+        deltaWeights = new double[neuron.getNumberOfInputs()];
+//        listOfX = new ArrayList<>();
+//        listOfB = new ArrayList<>();
     }
 
-    public void calculateB() {
+    public void passData(double[] x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+//    public double[] getB() {
+//        return b;
+//    }
+
+    public double[] calculateB() {
         // dla każdej wagi neuronu
+        double[] b = new double[neuron.getNumberOfInputs()];
         for (int i = 0; i < neuron.getWeights().length; i++) {
-            // dla każdego zestawu argumentów
-            for (int j = 0; j < listOfX.size(); j++) {
-                double y = neuron.activate(listOfX.get(j));
-                double v = listOfV.get(j);
-                double derivative = y * (1 - y);
-                double x = listOfX.get(j)[i];
-                double partialDerivative = (y - v) * derivative * x;
-                deltaWeights[i] += partialDerivative;
-//                b[i] += (y - v) * derivative;
-            }
+            double output = neuron.activate(x);
+            double desired = y;
+            double derivative = output * (1 - output);
+            b[i] = (output - desired) * derivative;
+        }
+        return b;
+    }
+
+    public void calculatePartialDerivative() {
+        double[] b = calculateB();
+        for (int i = 0; i < b.length; i++) {
+            double partialDerivative = b[i] * x[i];
+            deltaWeights[i] += partialDerivative;
+        }
+    }
+
+    public void updateWeights() {
+        for (int i = 0; i < deltaWeights.length; i++) {
             deltaWeights[i] *= -neuron.getLearningRate();
         }
+        neuron.updateWeights(deltaWeights);
     }
 
-    public void calculateDeltaWeights() {
-        for (int i = 0; i < neuron.getWeights().length; i++) {
-
-        }
+    public void resetDeltaWeights() {
+        Arrays.fill(deltaWeights, 0);
     }
 }

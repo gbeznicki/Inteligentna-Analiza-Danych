@@ -5,10 +5,10 @@ public class FirstLayer {
     public double[] outputs;
 
     public FirstLayer() {
-        x = new double[2];
+        x = new double[3];
         neurons = new Neuron[2];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(2);
+            neurons[i] = new Neuron(3);
         }
         outputs = new double[2];
     }

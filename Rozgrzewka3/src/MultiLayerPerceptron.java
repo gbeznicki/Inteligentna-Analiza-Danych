@@ -15,18 +15,18 @@ public class MultiLayerPerceptron {
     private FirstLayer firstLayer;
     private List<double[]> trainingX;
     private List<Double> trainingY;
-    private double previousQuality;
     private double quality;
     private double precision;
+    private int stop;
 
     public MultiLayerPerceptron() {
         lastLayer = new LastLayer();
         firstLayer = new FirstLayer();
         trainingX = new ArrayList<>();
         trainingY = new ArrayList<>();
-        previousQuality = Double.MAX_VALUE;
         quality = Double.MAX_VALUE;
-        precision = 0.001;
+        precision = 0.0001;
+        stop = 100000;
     }
 
     public void passData(List<DataLine> dataLines) {
@@ -70,16 +70,16 @@ public class MultiLayerPerceptron {
 
     // główna metoda sterująca przebiegiem uczenia sieci
     public void process() {
+        int i = 0;
         do {
-            previousQuality = quality;
             // zerujemy quality żeby móc zliczać sumę
             quality = 0;
             learningIteration();
             // sumę błędów z poszczególnych iteracji dzielimy przez ilość zestawów traningowych
             quality /= trainingX.size();
             printQualityFunction();
-        } while (quality > 0.0001);
-//        } while (previousQuality > quality);
+            i++;
+        } while (i < stop && quality > precision);
     }
 
     public void printQualityFunction() {

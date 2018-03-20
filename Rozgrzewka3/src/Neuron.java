@@ -1,19 +1,23 @@
+import java.util.Arrays;
 import java.util.Random;
 
 public class Neuron {
 
-    private double[] weights;
-    private int numberOfInputs;
-    private double learningRate;
+    public double[] deltaWeights;
+    public double[] weights;
+    public double b;
+    public int numberOfInputs;
+    public double learningRate;
 
     public Neuron(int numberOfInputs) {
         this.numberOfInputs = numberOfInputs;
+        deltaWeights = new double[numberOfInputs];
         weights = new double[numberOfInputs];
         learningRate = 0.1;
         initializeWeights();
     }
 
-    private void initializeWeights() {
+    public void initializeWeights() {
         for (int i = 0; i < weights.length; i++) {
             weights[i] = new Random().nextDouble() * 2 - 1;
         }
@@ -27,21 +31,13 @@ public class Neuron {
         return 1 / (1 + Math.exp(-sum));
     }
 
-    public void updateWeights(double[] deltaWeights) {
+    public void updateWeights() {
         for (int i = 0; i < weights.length; i++) {
-            weights[i] += deltaWeights[i];
+            weights[i] += -learningRate * deltaWeights[i];
         }
     }
 
-    public double[] getWeights() {
-        return weights;
-    }
-
-    public double getLearningRate() {
-        return learningRate;
-    }
-
-    public int getNumberOfInputs() {
-        return numberOfInputs;
+    public void resetDeltaWeights() {
+        Arrays.fill(deltaWeights, 0);
     }
 }

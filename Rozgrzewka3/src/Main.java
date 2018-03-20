@@ -8,8 +8,8 @@ public class Main {
         ir.read();
         ir.parseAllLines();
         List<DataLine> dataLines = ir.getDataLines();
-        for (DataLine dl : dataLines) {
-            System.out.println(dl.getY());
-        }
+        MultiLayerPerceptron mlp = new MultiLayerPerceptron();
+        mlp.passData(dataLines);
+        mlp.process();
     }
 }

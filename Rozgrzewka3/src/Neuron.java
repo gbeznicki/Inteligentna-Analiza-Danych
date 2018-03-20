@@ -3,11 +3,11 @@ import java.util.Random;
 
 public class Neuron {
 
-    public double[] deltaWeights;
-    public double[] weights;
-    public double b;
-    public int numberOfInputs;
-    public double learningRate;
+    private double[] deltaWeights;
+    private double[] weights;
+    private double b;
+    private int numberOfInputs;
+    private double learningRate;
 
     public Neuron(int numberOfInputs) {
         this.numberOfInputs = numberOfInputs;
@@ -15,6 +15,34 @@ public class Neuron {
         weights = new double[numberOfInputs];
         learningRate = 0.1;
         initializeWeights();
+    }
+
+    public double[] getDeltaWeights() {
+        return deltaWeights;
+    }
+
+    public void setDeltaWeights(double[] deltaWeights) {
+        this.deltaWeights = deltaWeights;
+    }
+
+    public void addDeltaWeights(int i, double value) {
+        deltaWeights[i] += value;
+    }
+
+    public double[] getWeights() {
+        return weights;
+    }
+
+    public void setWeights(double[] weights) {
+        this.weights = weights;
+    }
+
+    public double getB() {
+        return b;
+    }
+
+    public void setB(double b) {
+        this.b = b;
     }
 
     public void initializeWeights() {

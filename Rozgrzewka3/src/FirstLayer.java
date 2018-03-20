@@ -2,7 +2,7 @@ public class FirstLayer {
 
     private Neuron[] neurons;
     private double[] x;
-    public double[] outputs;
+    private double[] outputs;
 
     public FirstLayer() {
         x = new double[3];
@@ -17,6 +17,10 @@ public class FirstLayer {
         this.x = x;
     }
 
+    public double[] getOutputs() {
+        return outputs;
+    }
+
     public void process() {
         for (int i = 0; i < neurons.length; i++) {
             outputs[i] = neurons[i].activate(x);
@@ -29,7 +33,7 @@ public class FirstLayer {
         for (int i = 0; i < neurons.length; i++) {
             double output = neurons[i].activate(x);
             double derivative = output * (1 - output);
-            neurons[i].b = bUpperLayer * weightsUpperLayer[i] * derivative;
+            neurons[i].setB(bUpperLayer * weightsUpperLayer[i] * derivative);
         }
     }
 
@@ -37,9 +41,9 @@ public class FirstLayer {
         // dla każdego neuronu w warstwie
         for (int i = 0; i < neurons.length; i++) {
             // dla każdej wagi w neuronie
-            for (int j = 0; j < neurons[i].weights.length; j++) {
-                double partialDerivative = neurons[i].b * x[j];
-                neurons[i].deltaWeights[j] += partialDerivative;
+            for (int j = 0; j < neurons[i].getWeights().length; j++) {
+                double partialDerivative = neurons[i].getB() * x[j];
+                neurons[i].addDeltaWeights(j, partialDerivative);
             }
         }
     }

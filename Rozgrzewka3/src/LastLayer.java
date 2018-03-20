@@ -1,8 +1,8 @@
 public class LastLayer {
 
-    public Neuron neuron;
-    public double[] x;
-    public double y;
+    private Neuron neuron;
+    private double[] x;
+    private double y;
 
     public LastLayer() {
         neuron = new Neuron(3);
@@ -17,6 +17,10 @@ public class LastLayer {
         this.y = y;
     }
 
+    public Neuron getNeuron() {
+        return neuron;
+    }
+
     // zwracamy wyjście sieci
     public double generateOutput() {
         return neuron.activate(x);
@@ -27,14 +31,14 @@ public class LastLayer {
         double output = neuron.activate(x);
         double desired = y;
         double derivative = output * (1 - output);
-        neuron.b = (output - desired) * derivative;
+        neuron.setB((output - desired) * derivative);
     }
 
     // dla pojedynczego zestawu danych
     public void calculatePartialDerivative() {
-        for (int i = 0; i < neuron.deltaWeights.length; i++) {
-            double partialDerivative = neuron.b * x[i];
-            neuron.deltaWeights[i] += partialDerivative;
+        for (int i = 0; i < neuron.getDeltaWeights().length; i++) {
+            double partialDerivative = neuron.getB() * x[i];
+            neuron.addDeltaWeights(i, partialDerivative);
         }
     }
 

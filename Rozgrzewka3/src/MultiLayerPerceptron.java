@@ -43,7 +43,7 @@ public class MultiLayerPerceptron {
             double y = trainingY.get(i);
             firstLayer.passData(x);
             firstLayer.process();
-            double[] firstLayerOutputs = firstLayer.outputs;
+            double[] firstLayerOutputs = firstLayer.getOutputs();
             // ostatnia warstwa
             lastLayer.passData(firstLayerOutputs, y);
             double output = lastLayer.generateOutput();
@@ -52,10 +52,10 @@ public class MultiLayerPerceptron {
             lastLayer.calculateB();
             lastLayer.calculatePartialDerivative();
             // wracamy do pierwszej warstwy
-            double bFromUpperLayer = lastLayer.neuron.b;
+            double bFromUpperLayer = lastLayer.getNeuron().getB();
             double[] weightsFromUpperLayer = new double[2];
-            weightsFromUpperLayer[0] = lastLayer.neuron.weights[1];
-            weightsFromUpperLayer[1] = lastLayer.neuron.weights[2];
+            weightsFromUpperLayer[0] = lastLayer.getNeuron().getWeights()[1];
+            weightsFromUpperLayer[1] = lastLayer.getNeuron().getWeights()[2];
             firstLayer.calculateB(bFromUpperLayer, weightsFromUpperLayer);
             firstLayer.calculatePartialDerivative();
         }

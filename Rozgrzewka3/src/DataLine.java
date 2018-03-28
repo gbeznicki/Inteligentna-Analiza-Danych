@@ -8,7 +8,7 @@ public class DataLine {
 
     public DataLine(String lineString, int numberOfInputs, int numberOfOutputs) {
         this.lineString = lineString;
-        inputs = new double[numberOfInputs];
+        inputs = new double[numberOfInputs + 1];
         desiredOutputs = new double[numberOfOutputs];
     }
 

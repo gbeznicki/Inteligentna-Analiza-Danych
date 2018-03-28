@@ -6,11 +6,15 @@ public class InputReader {
     private List<DataLine> dataLines;
     private File dataFile;
     private String fileName;
+    private int numberOfInputs;
+    private int numberOfOutputs;
 
-    public InputReader(String fileName) {
+    public InputReader(String fileName, int numberOfInputs, int numberOfOutputs) {
         dataFile = new File(fileName);
         this.fileName = fileName;
         dataLines = new ArrayList<>();
+        this.numberOfInputs = numberOfInputs;
+        this.numberOfOutputs = numberOfOutputs;
     }
 
     public void read() {
@@ -18,7 +22,7 @@ public class InputReader {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    dataLines.add(new DataLine(line));
+                    dataLines.add(new DataLine(line, numberOfInputs, numberOfOutputs));
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

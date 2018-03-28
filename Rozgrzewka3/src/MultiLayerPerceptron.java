@@ -80,9 +80,36 @@ public class MultiLayerPerceptron {
             printQualityFunction();
             i++;
         } while (i < stop && quality > precision);
+//        lastLayer.printWeights();
+        doSampling();
     }
 
     public void printQualityFunction() {
         System.out.println(quality);
+    }
+
+    public void doSampling() {
+        List<double[]> xs = new ArrayList<>();
+        List<Double> ys = new ArrayList<>();
+        for (double i = -5; i < 10; i += 0.1) {
+            double[] xArray = new double[2];
+            xArray[0] = 1;
+            xArray[1] = i;
+            xs.add(xArray);
+        }
+        // podajemy dane do sieci
+        for (int i = 0; i < xs.size(); i++) {
+            firstLayer.passData(xs.get(i));
+            firstLayer.process();
+            double[] firstLayerOutputs = firstLayer.getOutputs();
+            // ostatnia warstwa
+            lastLayer.passData(firstLayerOutputs, 0.5);
+            double output = lastLayer.generateOutput();
+            ys.add(output);
+        }
+        // wypisanie na konsole
+        for (int i = 0; i < xs.size(); i++) {
+            System.out.println(xs.get(i)[1] + "\t" + ys.get(i));
+        }
     }
 }

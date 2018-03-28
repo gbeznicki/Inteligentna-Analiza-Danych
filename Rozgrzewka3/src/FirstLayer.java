@@ -5,10 +5,10 @@ public class FirstLayer {
     private double[] outputs;
 
     public FirstLayer() {
-        x = new double[3];
+        x = new double[2];
         neurons = new Neuron[2];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(3);
+            neurons[i] = new Neuron(2);
         }
         outputs = new double[2];
     }
@@ -59,4 +59,17 @@ public class FirstLayer {
             neurons[i].resetDeltaWeights();
         }
     }
+
+    public Neuron[] getNeurons() {
+        return neurons;
+    }
+
+    //    public void printWeights() {
+//        for (int i = 0; i < neurons.length; i++) {
+//            for (int j = 0; j < neurons[i].getWeights().length; j++) {
+//                System.out.print(neurons[i].getWeights()[j] + "\t");
+//            }
+//            System.out.println("");
+//        }
+//    }
 }

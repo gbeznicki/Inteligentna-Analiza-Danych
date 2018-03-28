@@ -31,8 +31,8 @@ public class MultiLayerPerceptron {
 
     public void passData(List<DataLine> dataLines) {
         for (DataLine data : dataLines) {
-            trainingX.add(data.getVectorX());
-            trainingY.add(data.getY());
+            trainingX.add(data.getInputs());
+            trainingY.add(data.getDesiredOutputs());
         }
     }
 

@@ -1,20 +1,26 @@
 public class FirstLayer {
 
     private Neuron[] neurons;
-    private double[] x;
+    private double[] inputs;
     private double[] outputs;
 
-    public FirstLayer() {
-        x = new double[2];
-        neurons = new Neuron[2];
+    public FirstLayer(int numberOfNeurons, int numberOfInputs) {
+        inputs = new double[numberOfInputs];
+        neurons = new Neuron[numberOfNeurons];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(2);
+            neurons[i] = new Neuron(numberOfInputs);
         }
-        outputs = new double[2];
+        outputs = new double[numberOfNeurons];
     }
 
-    public void passData(double[] x) {
-        this.x = x;
+    public void passData(double[] inputs) {
+        this.inputs = inputs;
+    }
+
+    public void calculateOutputs() {
+        for (int i = 0; i < neurons.length; i++) {
+            outputs[i] = neurons[i].activate(inputs);
+        }
     }
 
     public double[] getOutputs() {
@@ -23,26 +29,44 @@ public class FirstLayer {
 
     public void process() {
         for (int i = 0; i < neurons.length; i++) {
-            outputs[i] = neurons[i].activate(x);
+            outputs[i] = neurons[i].activate(inputs);
         }
     }
 
     // upper layer - w0; w1; w2
     // this layer - w1; w2
-    public void calculateB(double bUpperLayer, double[] weightsUpperLayer) {
+    public void calculateB(double[] bFromUpperLayer, double[][] weightsFromUpperLayer) {
+        // dla każdego neuronu z obecnej warstwy
         for (int i = 0; i < neurons.length; i++) {
-            double output = neurons[i].activate(x);
+            double b = 0.0;
+            double output = outputs[i];
             double derivative = output * (1 - output);
-            neurons[i].setB(bUpperLayer * weightsUpperLayer[i] * derivative);
+            // dla każdego neuronu z wyższej warstwy
+            for (int j = 0; j < weightsFromUpperLayer.length; j++) {
+                // odpowiadająca waga z neuronu z wyższej warstwy
+                double w = weightsFromUpperLayer[j][i];
+                b += bFromUpperLayer[j] * w;
+            }
+            b *= derivative;
+            neurons[i].setB(b);
         }
     }
+
+
+//    public void calculateB(double bUpperLayer, double[] weightsUpperLayer) {
+//        for (int i = 0; i < neurons.length; i++) {
+//            double output = neurons[i].activate(inputs);
+//            double derivative = output * (1 - output);
+//            neurons[i].setB(bUpperLayer * weightsUpperLayer[i] * derivative);
+//        }
+//    }
 
     public void calculatePartialDerivative() {
         // dla każdego neuronu w warstwie
         for (int i = 0; i < neurons.length; i++) {
             // dla każdej wagi w neuronie
             for (int j = 0; j < neurons[i].getWeights().length; j++) {
-                double partialDerivative = neurons[i].getB() * x[j];
+                double partialDerivative = neurons[i].getB() * inputs[j];
                 neurons[i].addDeltaWeights(j, partialDerivative);
             }
         }

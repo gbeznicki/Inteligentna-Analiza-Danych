@@ -12,19 +12,19 @@ public class MultiLayerPerceptron {
     private int stop;
     private boolean bias;
 
-    public MultiLayerPerceptron(int numberOfInputs, int numberOfHiddenLayerNeurons, int numberOfOutputs, double learningRate, double momentum, boolean bias) {
+    public MultiLayerPerceptron(int numberOfInputs, int numberOfHiddenLayerNeurons, int numberOfOutputs, double learningRate, double momentum, boolean bias, ActivationFunction hiddenLayerFunction, ActivationFunction outputLayerFunction) {
         int hiddenLayerInputs = numberOfInputs;
         int outputLayerInputs = numberOfHiddenLayerNeurons;
         if (bias) {
             hiddenLayerInputs++;
             outputLayerInputs++;
         }
-        outputLayer = new OutputLayer(numberOfOutputs, outputLayerInputs, learningRate, momentum);
-        hiddenLayer = new HiddenLayer(numberOfHiddenLayerNeurons, hiddenLayerInputs, learningRate, momentum);
+        outputLayer = new OutputLayer(numberOfOutputs, outputLayerInputs, learningRate, momentum, outputLayerFunction);
+        hiddenLayer = new HiddenLayer(numberOfHiddenLayerNeurons, hiddenLayerInputs, learningRate, momentum, hiddenLayerFunction);
         trainingInputs = new ArrayList<>();
         trainingDesiredOutputs = new ArrayList<>();
         quality = Double.MAX_VALUE;
-        precision = 1e-6;
+        precision = 1e-5;
         stop = 100000;
         this.bias = bias;
     }
@@ -96,7 +96,6 @@ public class MultiLayerPerceptron {
         int i = 0;
         do {
             // zerujemy quality żeby móc zliczać sumę
-//            System.out.println(this);
 
             quality = 0;
             learningIteration();
@@ -104,8 +103,6 @@ public class MultiLayerPerceptron {
             // sumę błędów z poszczególnych iteracji dzielimy przez ilość zestawów traningowych
             quality /= trainingInputs.size();
             printQualityFunction();
-
-
 
             i++;
         } while (i < stop && quality > precision);

@@ -6,11 +6,11 @@ public class HiddenLayer {
     private double[] inputs;
     private double[] outputs;
 
-    public HiddenLayer(int numberOfNeurons, int numberOfInputs, double learningRate, double momentum) {
+    public HiddenLayer(int numberOfNeurons, int numberOfInputs, double learningRate, double momentum, ActivationFunction function) {
         inputs = new double[numberOfInputs];
         neurons = new Neuron[numberOfNeurons];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(numberOfInputs, learningRate, momentum);
+            neurons[i] = new Neuron(numberOfInputs, learningRate, momentum, function);
         }
         outputs = new double[numberOfNeurons];
     }
@@ -21,8 +21,8 @@ public class HiddenLayer {
 
     public void calculateOutputs() {
         for (int i = 0; i < neurons.length; i++) {
-//            neurons[i].calculateWeightedSum(inputs);
-            outputs[i] = neurons[i].activateSigmoid(inputs);
+            neurons[i].calculateWeightedSum(inputs);
+            outputs[i] = neurons[i].activate();
         }
     }
 
@@ -34,8 +34,7 @@ public class HiddenLayer {
         // dla każdego neuronu z tej warstwy
         for (int i = 0; i < neurons.length; i++) {
             double b = 0.0;
-            double output = neurons[i].activateSigmoid(inputs);
-            double derivative = output * (1 - output);
+            double derivative = neurons[i].getActivationDerivative();
 
             // dla każdego neuronu z wyższej warstwy
             for (int j = 0; j < weightsFromUpperLayer.size(); j++) {

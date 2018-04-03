@@ -7,25 +7,25 @@ public class Main {
         String inputFileName = args[0];
         int numberOfInputs = 1;
         int numberOfOutputs = 1;
-        int numberOfHiddenLayerNeurons = 20;
+        int numberOfHiddenLayerNeurons = 5;
         double learningRate = 0.001;
         double momentum = 0;
         boolean bias = true;
+        ActivationFunction hiddenLayerFunction = new SigmoidalFunction();
+        ActivationFunction outputLayerFunction = new IdentityFunction();
 
+        // wczytanie danych z pliku
         InputReader ir = new InputReader(inputFileName, numberOfInputs, numberOfOutputs, bias);
         ir.read();
         ir.parseAllLines();
         List<DataLine> dataLines = ir.getDataLines();
 
-//        for (DataLine dl : dataLines) {
-//            System.out.println(dl);
-//        }
+        // stworzenie sieci
+        MultiLayerPerceptron mlp = new MultiLayerPerceptron(numberOfInputs, numberOfHiddenLayerNeurons, numberOfOutputs, learningRate, momentum, bias, hiddenLayerFunction, outputLayerFunction);
 
-        MultiLayerPerceptron mlp = new MultiLayerPerceptron(numberOfInputs, numberOfHiddenLayerNeurons, numberOfOutputs, learningRate, momentum, bias);
-
+        // podanie danych treningowych i nauka
         mlp.passData(dataLines);
         mlp.teachNetwork();
         mlp.doSampling();
-//        System.out.println(mlp);
     }
 }

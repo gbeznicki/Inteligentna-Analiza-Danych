@@ -9,15 +9,16 @@ public class Neuron {
     private double b;
     private double learningRate;
     private double momentum;
-//    private ActivationFunction function;
+    private double weightedSum;
+    private ActivationFunction function;
 
-    public Neuron(int numberOfInputs, double learningRate, double momentum) {
+    public Neuron(int numberOfInputs, double learningRate, double momentum, ActivationFunction function) {
         deltaWeights = new double[numberOfInputs];
         previousDeltaWeights = new double[numberOfInputs];
         weights = new double[numberOfInputs];
         this.learningRate = learningRate;
         this.momentum = momentum;
-//        this.function = function;
+        this.function = function;
         initializeWeights();
     }
 
@@ -41,42 +42,26 @@ public class Neuron {
         this.b = b;
     }
 
-//    public ActivationFunction getFunction() {
-//        return function;
-//    }
-
     public void initializeWeights() {
         for (int i = 0; i < weights.length; i++) {
             weights[i] = new Random().nextDouble() * 2 - 1;
         }
     }
 
-//    public void calculateWeightedSum(double[] x) {
-//        weightedSum = 0.0;
-//        for (int i = 0; i < x.length; i++) {
-//            weightedSum += x[i] * weights[i];
-//        }
-//    }
-
-    public double activateSigmoid(double[] x) {
-        double weightedSum = 0.0;
+    public void calculateWeightedSum(double[] x) {
+        weightedSum = 0.0;
         for (int i = 0; i < x.length; i++) {
             weightedSum += x[i] * weights[i];
         }
-        return 1 / (1 + Math.exp(-weightedSum));
     }
 
-    public double activateIdentity(double[] x) {
-        double weightedSum = 0.0;
-        for (int i = 0; i < x.length; i++) {
-            weightedSum += x[i] * weights[i];
-        }
-        return weightedSum;
+    public double activate() {
+        return function.calculate(weightedSum);
     }
 
-//    public double getActivationDerivative() {
-//        return function.calculateDerivative(weightedSum);
-//    }
+    public double getActivationDerivative() {
+        return function.calculateDerivative(weightedSum);
+    }
 
     public void updateWeights() {
         for (int i = 0; i < weights.length; i++) {

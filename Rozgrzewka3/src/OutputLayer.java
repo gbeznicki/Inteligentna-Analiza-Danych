@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class OutputLayer {
 
     private Neuron[] neurons;
@@ -8,10 +6,10 @@ public class OutputLayer {
     private double[] outputs;
     private double[] b;
 
-    public OutputLayer(int numberOfNeurons, int numberOfInputs, double learningRate, double momentum) {
+    public OutputLayer(int numberOfNeurons, int numberOfInputs, double learningRate, double momentum, ActivationFunction function) {
         neurons = new Neuron[numberOfNeurons];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(numberOfInputs, learningRate, momentum);
+            neurons[i] = new Neuron(numberOfInputs, learningRate, momentum, function);
         }
         inputs = new double[numberOfInputs];
         outputs = new double[numberOfNeurons];
@@ -38,8 +36,8 @@ public class OutputLayer {
     // obliczamy wyjście sieci
     public void calculateOutputs() {
         for (int i = 0; i < neurons.length; i++) {
-//            neurons[i].calculateWeightedSum(inputs);
-            outputs[i] = neurons[i].activateIdentity(inputs);
+            neurons[i].calculateWeightedSum(inputs);
+            outputs[i] = neurons[i].activate();
         }
     }
 
@@ -50,16 +48,19 @@ public class OutputLayer {
     // dla pojedynczego zestawu danych
     public void calculateB() {
         for (int i = 0; i < neurons.length; i++) {
-            double output = neurons[i].activateIdentity(inputs);
+            double output = neurons[i].activate();
             double desiredOutput = desiredOutputs[i];
-            double derivative = 1.0;
+            double derivative = neurons[i].getActivationDerivative();
             double b = (output - desiredOutput) * derivative;
             neurons[i].setB(b);
-            this.b[i] = b;
         }
     }
 
     public double[] getB() {
+        // wpisz aktualne wartości błędów do tablicy
+        for (int i = 0; i < b.length; i++) {
+            b[i] = neurons[i].getB();
+        }
         return b;
     }
 

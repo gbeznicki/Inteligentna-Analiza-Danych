@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +15,10 @@ public class MultiLayerPerceptron {
     private double precision;
     private int stop;
     private boolean bias;
+    private int it;
+
+    private List<double[]> testInputs;
+    private List<double[]> testDesiredOutputs;
 
     public MultiLayerPerceptron(int numberOfInputs, int numberOfHiddenLayerNeurons, int numberOfOutputs, double learningRate, double momentum, boolean bias, ActivationFunction hiddenLayerFunction, ActivationFunction outputLayerFunction) {
         int hiddenLayerInputs = numberOfInputs;
@@ -25,14 +33,24 @@ public class MultiLayerPerceptron {
         trainingDesiredOutputs = new ArrayList<>();
         quality = Double.MAX_VALUE;
         precision = 1e-5;
-        stop = 100000;
+        stop = 1000000;
         this.bias = bias;
+
+        testInputs = new ArrayList<>();
+        testDesiredOutputs = new ArrayList<>();
     }
 
     public void passData(List<DataLine> dataLines) {
         for (DataLine data : dataLines) {
             trainingInputs.add(data.getInputs());
             trainingDesiredOutputs.add(data.getDesiredOutputs());
+        }
+    }
+
+    public void passTestData(List<DataLine> testData) {
+        for (DataLine data : testData) {
+            testInputs.add(data.getInputs());
+            testDesiredOutputs.add(data.getDesiredOutputs());
         }
     }
 
@@ -102,10 +120,17 @@ public class MultiLayerPerceptron {
 
             // sumę błędów z poszczególnych iteracji dzielimy przez ilość zestawów traningowych
             quality /= trainingInputs.size();
+
             printQualityFunction();
+            testQuality();
 
             i++;
         } while (i < stop && quality > precision);
+        it = i;
+    }
+
+    public int getIt() {
+        return it;
     }
 
     private double[] addBiasToArray(double[] array) {
@@ -125,16 +150,54 @@ public class MultiLayerPerceptron {
         System.out.println(quality);
     }
 
+    public void testQuality() {
+        double error = 0.0;
+
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream(new File("test.txt"),true));
+            for (int i = 0; i < testInputs.size(); i++) {
+
+
+                double[] inputs = testInputs.get(i);
+                double desired = testDesiredOutputs.get(i)[0];
+
+                hiddenLayer.passData(inputs);
+                hiddenLayer.calculateOutputs();
+                double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
+
+                if (bias) {
+                    hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
+                }
+
+                // ostatnia warstwa
+                outputLayer.passData(hiddenLayerOutputs);
+                outputLayer.calculateOutputs();
+
+                // wyjścia sieci
+                double output = outputLayer.getOutputs()[0];
+                error += 0.5 * (output - desired) * (output - desired);
+            }
+            pw.append(String.valueOf(error));
+            pw.append("\n");
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
     public void doSampling() {
         List<double[]> inputs = new ArrayList<>();
         List<double[]> outputs = new ArrayList<>();
 
-//        inputs.add(new double[] {1, 1, 0, 0, 0});
-//        inputs.add(new double[] {1, 0, 1, 0, 0});
-//        inputs.add(new double[] {1, 0, 0, 1, 0});
-//        inputs.add(new double[] {1, 0, 0, 0, 1});
+//        inputs.add(new double[] {1, 0, 0, 0});
+//        inputs.add(new double[] {0, 1, 0, 0});
+//        inputs.add(new double[] {0, 0, 1, 0});
+//        inputs.add(new double[] {0, 0, 0, 1});
 
-        for (double i = -4.0; i < 4.0; i += 0.1) {
+        for (double i = -4.0; i <= 4.0; i += 0.05) {
             inputs.add(new double[] {1, i});
         }
 
@@ -159,7 +222,11 @@ public class MultiLayerPerceptron {
             for (int j = 1; j < inputs.get(i).length; j++) {
                 System.out.print(inputs.get(i)[j] + "\t");
             }
-//            System.out.print("\tWyjście: ");
+//            System.out.println("\nWarstwa ukryta: ");
+//            for (int j = 0; j < hiddenLayerOutputs.length; j++) {
+//                System.out.println(hiddenLayerOutputs[j] + "\t");
+//            }
+//            System.out.print("\nWyjście: ");
             for (int j = 0; j < output.length; j++) {
                 System.out.print(output[j] + "\t");
             }

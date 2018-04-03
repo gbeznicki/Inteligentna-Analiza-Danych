@@ -20,6 +20,8 @@ public class MultiLayerPerceptron {
     private List<double[]> testInputs;
     private List<double[]> testDesiredOutputs;
 
+    private double testQuality;
+
     public MultiLayerPerceptron(int numberOfInputs, int numberOfHiddenLayerNeurons, int numberOfOutputs, double learningRate, double momentum, boolean bias, ActivationFunction hiddenLayerFunction, ActivationFunction outputLayerFunction) {
         int hiddenLayerInputs = numberOfInputs;
         int outputLayerInputs = numberOfHiddenLayerNeurons;
@@ -33,11 +35,13 @@ public class MultiLayerPerceptron {
         trainingDesiredOutputs = new ArrayList<>();
         quality = Double.MAX_VALUE;
         precision = 1e-5;
-        stop = 1000000;
+        stop = 100000;
         this.bias = bias;
 
         testInputs = new ArrayList<>();
         testDesiredOutputs = new ArrayList<>();
+
+
     }
 
     public void passData(List<DataLine> dataLines) {
@@ -121,11 +125,11 @@ public class MultiLayerPerceptron {
             // sumę błędów z poszczególnych iteracji dzielimy przez ilość zestawów traningowych
             quality /= trainingInputs.size();
 
-            printQualityFunction();
-            testQuality();
+//            printQualityFunction();
+//            testQuality();
 
             i++;
-        } while (i < stop && quality > precision);
+        } while (i < stop/* && quality > precision*/);
         it = i;
     }
 
@@ -150,43 +154,80 @@ public class MultiLayerPerceptron {
         System.out.println(quality);
     }
 
-    public void testQuality() {
+    public double getTrainQuality() {
+        return quality;
+    }
+
+    public double testQuality() {
         double error = 0.0;
 
-        try {
-            PrintWriter pw = new PrintWriter(new FileOutputStream(new File("test.txt"),true));
-            for (int i = 0; i < testInputs.size(); i++) {
+        for (int i = 0; i < testInputs.size(); i++) {
 
 
-                double[] inputs = testInputs.get(i);
-                double desired = testDesiredOutputs.get(i)[0];
+            double[] inputs = testInputs.get(i);
+            double desired = testDesiredOutputs.get(i)[0];
 
-                hiddenLayer.passData(inputs);
-                hiddenLayer.calculateOutputs();
-                double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
+            hiddenLayer.passData(inputs);
+            hiddenLayer.calculateOutputs();
+            double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
 
-                if (bias) {
-                    hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
-                }
-
-                // ostatnia warstwa
-                outputLayer.passData(hiddenLayerOutputs);
-                outputLayer.calculateOutputs();
-
-                // wyjścia sieci
-                double output = outputLayer.getOutputs()[0];
-                error += 0.5 * (output - desired) * (output - desired);
+            if (bias) {
+                hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
             }
-            pw.append(String.valueOf(error));
-            pw.append("\n");
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
+            // ostatnia warstwa
+            outputLayer.passData(hiddenLayerOutputs);
+            outputLayer.calculateOutputs();
+
+            // wyjścia sieci
+            double output = outputLayer.getOutputs()[0];
+            error += 0.5 * (output - desired) * (output - desired);
         }
 
-
-
+        error /= testInputs.size();
+        return error;
     }
+
+//    public void testQuality() {
+//        double error = 0.0;
+//
+//        try {
+//            PrintWriter pw = new PrintWriter(new FileOutputStream(new File("test.txt"),true));
+//            for (int i = 0; i < testInputs.size(); i++) {
+//
+//
+//                double[] inputs = testInputs.get(i);
+//                double desired = testDesiredOutputs.get(i)[0];
+//
+//                hiddenLayer.passData(inputs);
+//                hiddenLayer.calculateOutputs();
+//                double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
+//
+//                if (bias) {
+//                    hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
+//                }
+//
+//                // ostatnia warstwa
+//                outputLayer.passData(hiddenLayerOutputs);
+//                outputLayer.calculateOutputs();
+//
+//                // wyjścia sieci
+//                double output = outputLayer.getOutputs()[0];
+//                error += 0.5 * (output - desired) * (output - desired);
+//            }
+//
+//            error /= testInputs.size();
+//
+//            pw.append(String.valueOf(error));
+//            pw.append("\n");
+//            pw.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//
+//    }
 
     public void doSampling() {
         List<double[]> inputs = new ArrayList<>();

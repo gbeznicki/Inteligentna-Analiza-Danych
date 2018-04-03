@@ -2,86 +2,126 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MultiLayerPerceptron {
-    // dla każdego zestawu danych
-    // najpierw podajemy dane do pierwszej warstwy
-    // przekazujemy rezultat do warstwy ostatniej
-    // tam liczymy b i delty
-    // podajemy do warstwy wcześniejszej
-    // liczymy w 1 warstwie b i delty
-    // po skończonym całym cyklu obliczamy wartość funkcji oceniającej
-    // aktualizujemy wagi
 
-    private LastLayer lastLayer;
-    private FirstLayer firstLayer;
-    private List<double[]> trainingX;
-    private List<Double> trainingY;
+    private OutputLayer outputLayer;
+    private HiddenLayer hiddenLayer;
+    private List<double[]> trainingInputs;
+    private List<double[]> trainingDesiredOutputs;
     private double quality;
     private double precision;
     private int stop;
+    private boolean bias;
 
-    public MultiLayerPerceptron() {
-        lastLayer = new LastLayer();
-        firstLayer = new FirstLayer();
-        trainingX = new ArrayList<>();
-        trainingY = new ArrayList<>();
+    public MultiLayerPerceptron(int numberOfInputs, int numberOfHiddenLayerNeurons, int numberOfOutputs, double learningRate, double momentum, boolean bias) {
+        int hiddenLayerInputs = numberOfInputs;
+        int outputLayerInputs = numberOfHiddenLayerNeurons;
+        if (bias) {
+            hiddenLayerInputs++;
+            outputLayerInputs++;
+        }
+        outputLayer = new OutputLayer(numberOfOutputs, outputLayerInputs, learningRate, momentum);
+        hiddenLayer = new HiddenLayer(numberOfHiddenLayerNeurons, hiddenLayerInputs, learningRate, momentum);
+        trainingInputs = new ArrayList<>();
+        trainingDesiredOutputs = new ArrayList<>();
         quality = Double.MAX_VALUE;
-        precision = 0.0001;
+        precision = 1e-6;
         stop = 100000;
+        this.bias = bias;
     }
 
     public void passData(List<DataLine> dataLines) {
         for (DataLine data : dataLines) {
-            trainingX.add(data.getInputs());
-            trainingY.add(data.getDesiredOutputs());
+            trainingInputs.add(data.getInputs());
+            trainingDesiredOutputs.add(data.getDesiredOutputs());
         }
     }
 
     public void learningIteration() {
-        for (int i = 0; i < trainingX.size(); i++) {
-            // pierwsza warstwa
-            double[] x = trainingX.get(i);
-            double y = trainingY.get(i);
-            firstLayer.passData(x);
-            firstLayer.process();
-            double[] firstLayerOutputs = firstLayer.getOutputs();
-            // ostatnia warstwa
-            lastLayer.passData(firstLayerOutputs, y);
-            double output = lastLayer.generateOutput();
-            // obliczenie błędu dla pojedynczego zestawu danych
-            quality += 0.5 * (output - y) * (output - y);
-            lastLayer.calculateB();
-            lastLayer.calculatePartialDerivative();
-            // wracamy do pierwszej warstwy
-            double bFromUpperLayer = lastLayer.getNeuron().getB();
-            double[] weightsFromUpperLayer = new double[2];
-            weightsFromUpperLayer[0] = lastLayer.getNeuron().getWeights()[1];
-            weightsFromUpperLayer[1] = lastLayer.getNeuron().getWeights()[2];
-            firstLayer.calculateB(bFromUpperLayer, weightsFromUpperLayer);
-            firstLayer.calculatePartialDerivative();
+        for (int i = 0; i < trainingInputs.size(); i++) {
+            // pobranie jednego zestawu danych
+            double[] inputs = trainingInputs.get(i);
+            double[] desiredOutputs = trainingDesiredOutputs.get(i);
+
+            // warstwa ukryta
+            hiddenLayer.passData(inputs);
+            hiddenLayer.calculateOutputs();
+            double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
+
+            // jeżeli korzystamy z biasu, to dodajemy x0 = 1
+            if (bias) {
+                hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
+            }
+
+            // warstwa wyjściowa
+            outputLayer.passTrainingData(hiddenLayerOutputs, desiredOutputs);
+            outputLayer.calculateOutputs();
+            double[] outputs = outputLayer.getOutputs();
+
+            // dla każdego neuronu w warstwie wyjściowej obliczamy wartość funkcji oceniającej
+            for (int j = 0; j < outputs.length; j++) {
+                quality += 0.5 * (outputs[j] - desiredOutputs[j]) * (outputs[j] - desiredOutputs[j]);
+            }
+
+            // obliczenie błędów w warstwie wyjściowej
+            outputLayer.calculateB();
+            outputLayer.calculatePartialDerivative();
+
+            // wsteczna propagacja, wracamy do warstwy ukrytej
+            double[] bFromOutputLayer = outputLayer.getB();
+
+            // pobierz wagi z warstwy wyjściowej
+            List<double[]> weightsFromOutputLayer = new ArrayList<>();
+            for (int j = 0; j < outputLayer.getNeurons().length; j++) {
+                double[] w = outputLayer.getNeurons()[j].getWeights();
+                weightsFromOutputLayer.add(w);
+            }
+
+            // obliczenie błędów w warstwie ukrytej
+            hiddenLayer.calculateB(bFromOutputLayer, weightsFromOutputLayer, bias);
+            hiddenLayer.calculatePartialDerivative();
         }
         // po przejściu przez wszystkie zestawy treningowe aktualizujemy wagi i zerujemy odpowiednie tablice
-        // aktualizzacja wag w ostatniej warstwie
-        lastLayer.updateWeights();
-        lastLayer.resetDeltaWeights();
-        // aktualizacja wag w pierwszej warstwie
-        firstLayer.updateWeights();
-        firstLayer.resetDeltaWeights();
+
+        // aktualizacja wag w warstwie wyjściowej
+        outputLayer.updateWeights();
+        outputLayer.resetDeltaWeights();
+
+        // aktualizacja wag w warstwie ukrytej
+        hiddenLayer.updateWeights();
+        hiddenLayer.resetDeltaWeights();
     }
 
     // główna metoda sterująca przebiegiem uczenia sieci
-    public void process() {
+    public void teachNetwork() {
         int i = 0;
         do {
             // zerujemy quality żeby móc zliczać sumę
+//            System.out.println(this);
+
             quality = 0;
             learningIteration();
+
             // sumę błędów z poszczególnych iteracji dzielimy przez ilość zestawów traningowych
-            quality /= trainingX.size();
+            quality /= trainingInputs.size();
             printQualityFunction();
+
+
+
             i++;
         } while (i < stop && quality > precision);
-//        lastLayer.printWeights();
-        doSampling();
+    }
+
+    private double[] addBiasToArray(double[] array) {
+        double[] arrayWithBias = new double[array.length + 1];
+
+        // dodaj x0 = 1 jako bias
+        arrayWithBias[0] = 1.0;
+
+        // przekopiuj resztę wartości wejściowych do tablicy
+        for (int i = 1; i < arrayWithBias.length; i++) {
+            arrayWithBias[i] = array[i - 1];
+        }
+        return arrayWithBias;
     }
 
     public void printQualityFunction() {
@@ -89,27 +129,62 @@ public class MultiLayerPerceptron {
     }
 
     public void doSampling() {
-        List<double[]> xs = new ArrayList<>();
-        List<Double> ys = new ArrayList<>();
-        for (double i = -5; i < 10; i += 0.1) {
-            double[] xArray = new double[2];
-            xArray[0] = 1;
-            xArray[1] = i;
-            xs.add(xArray);
+        List<double[]> inputs = new ArrayList<>();
+        List<double[]> outputs = new ArrayList<>();
+
+//        inputs.add(new double[] {1, 1, 0, 0, 0});
+//        inputs.add(new double[] {1, 0, 1, 0, 0});
+//        inputs.add(new double[] {1, 0, 0, 1, 0});
+//        inputs.add(new double[] {1, 0, 0, 0, 1});
+
+        for (double i = -4.0; i < 4.0; i += 0.1) {
+            inputs.add(new double[] {1, i});
         }
+
         // podajemy dane do sieci
-        for (int i = 0; i < xs.size(); i++) {
-            firstLayer.passData(xs.get(i));
-            firstLayer.process();
-            double[] firstLayerOutputs = firstLayer.getOutputs();
+        for (int i = 0; i < inputs.size(); i++) {
+            hiddenLayer.passData(inputs.get(i));
+            hiddenLayer.calculateOutputs();
+            double[] hiddenLayerOutputs = hiddenLayer.getOutputs();
+
+            if (bias) {
+                hiddenLayerOutputs = addBiasToArray(hiddenLayerOutputs);
+            }
+
             // ostatnia warstwa
-            lastLayer.passData(firstLayerOutputs, 0.5);
-            double output = lastLayer.generateOutput();
-            ys.add(output);
+            outputLayer.passData(hiddenLayerOutputs);
+            outputLayer.calculateOutputs();
+
+            // wyjścia sieci
+            double[] output = outputLayer.getOutputs();
+
+//            System.out.print("Wejście: ");
+            for (int j = 1; j < inputs.get(i).length; j++) {
+                System.out.print(inputs.get(i)[j] + "\t");
+            }
+//            System.out.print("\tWyjście: ");
+            for (int j = 0; j < output.length; j++) {
+                System.out.print(output[j] + "\t");
+            }
+            System.out.println("");
+
+            outputs.add(output);
         }
         // wypisanie na konsole
-        for (int i = 0; i < xs.size(); i++) {
-            System.out.println(xs.get(i)[1] + "\t" + ys.get(i));
-        }
+//        for (int i = 0; i < inputs.size(); i++) {
+//            System.out.print("Wejście: ");
+//            for (int j = 0; j < inputs.get(i).length; j++) {
+//                System.out.print(inputs.get(i)[j] + "\t");
+//            }
+//            System.out.print("\tWyjście: ");
+//            for (int j = 0; j < inputs.get(i).length; j++) {
+//                System.out.print(outputs.get(i)[j] + "\t");
+//            }
+//            System.out.println("");
+//        }
+    }
+
+    public String toString() {
+        return hiddenLayer + "\n" + outputLayer + "\n";
     }
 }

@@ -1,14 +1,16 @@
-public class FirstLayer {
+import java.util.List;
+
+public class HiddenLayer {
 
     private Neuron[] neurons;
     private double[] inputs;
     private double[] outputs;
 
-    public FirstLayer(int numberOfNeurons, int numberOfInputs) {
+    public HiddenLayer(int numberOfNeurons, int numberOfInputs, double learningRate, double momentum) {
         inputs = new double[numberOfInputs];
         neurons = new Neuron[numberOfNeurons];
         for (int i = 0; i < neurons.length; i++) {
-            neurons[i] = new Neuron(numberOfInputs);
+            neurons[i] = new Neuron(numberOfInputs, learningRate, momentum);
         }
         outputs = new double[numberOfNeurons];
     }
@@ -19,7 +21,8 @@ public class FirstLayer {
 
     public void calculateOutputs() {
         for (int i = 0; i < neurons.length; i++) {
-            outputs[i] = neurons[i].activate(inputs);
+//            neurons[i].calculateWeightedSum(inputs);
+            outputs[i] = neurons[i].activateSigmoid(inputs);
         }
     }
 
@@ -27,43 +30,35 @@ public class FirstLayer {
         return outputs;
     }
 
-    public void process() {
-        for (int i = 0; i < neurons.length; i++) {
-            outputs[i] = neurons[i].activate(inputs);
-        }
-    }
-
-    // upper layer - w0; w1; w2
-    // this layer - w1; w2
-    public void calculateB(double[] bFromUpperLayer, double[][] weightsFromUpperLayer) {
-        // dla każdego neuronu z obecnej warstwy
+    public void calculateB(double[] bFromUpperLayer, List<double[]> weightsFromUpperLayer, boolean bias) {
+        // dla każdego neuronu z tej warstwy
         for (int i = 0; i < neurons.length; i++) {
             double b = 0.0;
-            double output = outputs[i];
+            double output = neurons[i].activateSigmoid(inputs);
             double derivative = output * (1 - output);
+
             // dla każdego neuronu z wyższej warstwy
-            for (int j = 0; j < weightsFromUpperLayer.length; j++) {
-                // odpowiadająca waga z neuronu z wyższej warstwy
-                double w = weightsFromUpperLayer[j][i];
-                b += bFromUpperLayer[j] * w;
+            for (int j = 0; j < weightsFromUpperLayer.size(); j++) {
+                if (bias) {
+                    // wybieramy i+1-szą wagę z j-tego neuronu warstwy wyższej (bo stosujemy bias, dlatego pomijamy w0)
+                    double w = weightsFromUpperLayer.get(j)[i + 1];
+                    b += bFromUpperLayer[j] * w;
+                }
+                else {
+                    // wybieramy i-tą wagę z j-tego neuronu warstwy wyższej
+                    double w = weightsFromUpperLayer.get(j)[i];
+                    b += bFromUpperLayer[j] * w;
+                }
             }
             b *= derivative;
             neurons[i].setB(b);
         }
     }
 
-
-//    public void calculateB(double bUpperLayer, double[] weightsUpperLayer) {
-//        for (int i = 0; i < neurons.length; i++) {
-//            double output = neurons[i].activate(inputs);
-//            double derivative = output * (1 - output);
-//            neurons[i].setB(bUpperLayer * weightsUpperLayer[i] * derivative);
-//        }
-//    }
-
     public void calculatePartialDerivative() {
         // dla każdego neuronu w warstwie
         for (int i = 0; i < neurons.length; i++) {
+
             // dla każdej wagi w neuronie
             for (int j = 0; j < neurons[i].getWeights().length; j++) {
                 double partialDerivative = neurons[i].getB() * inputs[j];
@@ -84,16 +79,15 @@ public class FirstLayer {
         }
     }
 
-    public Neuron[] getNeurons() {
-        return neurons;
+    public String toString() {
+        String s = "Hidden layer\n";
+        for (int i = 0; i < neurons.length; i++) {
+            s += i + " neuron's weights: ";
+            for (int j = 0; j < neurons[i].getWeights().length; j++) {
+                s += neurons[i].getWeights()[j] + "\t";
+            }
+            s += "\n";
+        }
+        return s;
     }
-
-    //    public void printWeights() {
-//        for (int i = 0; i < neurons.length; i++) {
-//            for (int j = 0; j < neurons[i].getWeights().length; j++) {
-//                System.out.print(neurons[i].getWeights()[j] + "\t");
-//            }
-//            System.out.println("");
-//        }
-//    }
 }

@@ -8,13 +8,15 @@ public class InputReader {
     private String fileName;
     private int numberOfInputs;
     private int numberOfOutputs;
+    private boolean bias;
 
-    public InputReader(String fileName, int numberOfInputs, int numberOfOutputs) {
+    public InputReader(String fileName, int numberOfInputs, int numberOfOutputs, boolean bias) {
         dataFile = new File(fileName);
         this.fileName = fileName;
         dataLines = new ArrayList<>();
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
+        this.bias = bias;
     }
 
     public void read() {
@@ -22,7 +24,7 @@ public class InputReader {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    dataLines.add(new DataLine(line, numberOfInputs, numberOfOutputs));
+                    dataLines.add(new DataLine(line, numberOfInputs, numberOfOutputs, bias));
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

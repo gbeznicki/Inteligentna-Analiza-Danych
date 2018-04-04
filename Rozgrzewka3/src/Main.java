@@ -7,7 +7,7 @@ public class Main {
         String inputFileName = args[0];
         int numberOfInputs = 1;
         int numberOfOutputs = 1;
-        int numberOfHiddenLayerNeurons = 1;
+        int numberOfHiddenLayerNeurons = 13;
         double learningRate = 0.0001;
         double momentum = 0;
         boolean bias = true;

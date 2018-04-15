@@ -36,5 +36,6 @@ public class Main {
 
         for (int i = 0; i < k; i++) {
             kPointList.add(pointFactory.generateRandomPoint(-10, 10, 0));
-        }    }
+        }
+    }
 }

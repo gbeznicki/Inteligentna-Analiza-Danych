@@ -23,10 +23,16 @@ public class Program {
         for (int i = 0; i < quantity; i++) {
             normalPointList.add(pointFactory.generatePointsInsideCircle(2, centre1));
         }
+        for (int i = 0; i < normalPointList.size(); i++) {
+            System.out.println(normalPointList.get(i).getX() + " " + normalPointList.get(i).getY());
+        }
 
         //Losowanie 2 koła czarnych punktów
         for (int i = 0; i < quantity; i++) {
             normalPointList.add(pointFactory.generatePointsInsideCircle(2, centre2));
+        }
+        for (int i = 0; i < normalPointList.size(); i++) {
+            System.out.println(normalPointList.get(i).getX() + " " + normalPointList.get(i).getY());
         }
 
         for (int i = 0; i < k; i++) {

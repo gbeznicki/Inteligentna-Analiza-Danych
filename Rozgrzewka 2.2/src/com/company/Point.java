@@ -5,17 +5,17 @@ public class Point {
     private double y;
     private int group;
 
-    public Point(double x, double y){
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public Point(Point p){
-        this.x = p.getX();
-        this.y = p.getY();
+    public Point(Point p) {
+        this.x = p.x;
+        this.y = p.y;
     }
 
-    public Point(double x, double y, int group){
+    public Point(double x, double y, int group) {
         this.x = x;
         this.y = y;
         this.group = group;
@@ -46,8 +46,8 @@ public class Point {
     }
 
     @Override
-    public String toString(){
-        return x+" "+y;
+    public String toString() {
+        return x + " " + y;
     }
 
 

@@ -1,12 +1,13 @@
 package com.company;
 
-public class WinnerTakesAll implements NeighbourhoodFunction{
+import java.util.List;
+
+public class WinnerTakesAll implements NeighbourhoodFunction {
 
     @Override
     public double calculateTheta(Point winningNeuron, Point currentNeuron, int iteration) {
-        if(winningNeuron.equals(currentNeuron)){
+        if (winningNeuron == currentNeuron) {
             return 1;
-        }
-        else return 0;
+        } else return 0;
     }
 }

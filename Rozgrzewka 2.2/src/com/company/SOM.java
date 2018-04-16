@@ -12,22 +12,23 @@ public class SOM {
 
     private List<Point> dataPoints;
     private List<Point> neurons;
-    private List<Point> neuronsPrevious;
+    private List<Point> previousNeurons;
     private double initialLearningRate;
     private double actualLearningRate;
     private NeighbourhoodFunction func;
     private int iteration = 1;
-    private double precision = 0.0001;
+    private double precision = 1e-5;
     private double actualError;
 
     public SOM(List<Point> dataPoints, List<Point> neurons, double initialLearningRate, NeighbourhoodFunction func) {
         this.dataPoints = dataPoints;
         this.neurons = neurons;
         this.initialLearningRate = initialLearningRate;
+        actualLearningRate = initialLearningRate;
         this.func = func;
-        neuronsPrevious = new ArrayList<>();
+        previousNeurons = new ArrayList<>();
         for (int i = 0; i < neurons.size(); i++) {
-            neuronsPrevious.add(new Point(neurons.get(i)));
+            previousNeurons.add(new Point(neurons.get(i)));
         }
     }
 
@@ -35,11 +36,11 @@ public class SOM {
         double min = Double.MAX_VALUE;
         int index = 0;
 
-        for (int j = 0; j < neurons.size(); j++) {
-            double distance = calculateDistanceBetweenPoints(dataPoint, neurons.get(j));
+        for (int i = 0; i < neurons.size(); i++) {
+            double distance = calculateDistanceBetweenPoints(dataPoint, neurons.get(i));
             if (distance < min) {
                 min = distance;
-                index = j;
+                index = i;
             }
         }
 
@@ -67,12 +68,13 @@ public class SOM {
         }
     }
 
-    public boolean chceckStopCondition(List<Point> previous, List<Point> actual) {
+    public boolean checkStopCondition() {
 
-        for (int i = 0; i < previous.size(); i++) {
-            double x = Math.abs(previous.get(i).getX() - actual.get(i).getX());
-            double y = Math.abs(previous.get(i).getY() - actual.get(i).getY());
-            if (x > precision && y > precision) {
+        for (int i = 0; i < neurons.size(); i++) {
+            double diffX = Math.abs(previousNeurons.get(i).getX() - neurons.get(i).getX());
+            double diffY = Math.abs(previousNeurons.get(i).getY() - neurons.get(i).getY());
+
+            if (diffX > precision || diffY > precision) {
                 return false;
             }
         }
@@ -80,9 +82,10 @@ public class SOM {
     }
 
     public void updatePreviousNeurons() {
-        neuronsPrevious.clear();
+        previousNeurons.clear();
         for (int i = 0; i < neurons.size(); i++) {
-            neuronsPrevious.add(new Point(neurons.get(i)));
+
+            previousNeurons.add(new Point(neurons.get(i)));
         }
     }
 
@@ -92,21 +95,23 @@ public class SOM {
             Point closestNeuron = getBestMatchingUnit(dataPoints.get(i));
             actualError += calculateDistanceBetweenPoints(dataPoint, closestNeuron);
         }
-        actualError/=dataPoints.size();
+        actualError /= dataPoints.size();
     }
 
     public void doSOM() {
         do {
+            actualError = 0;
+            updatePreviousNeurons();
             iterate();
             updateLearningRate();
-            updatePreviousNeurons();
             calculateError();
             System.out.println(actualError);
-            actualError = 0;
             saveToFile(iteration);
 
             iteration++;
-        } while (chceckStopCondition(neuronsPrevious, neurons) && iteration <= 1000);
+        } while (!checkStopCondition());
+
+        System.out.println(iteration);
     }
 
     private void saveToFile(int index) {

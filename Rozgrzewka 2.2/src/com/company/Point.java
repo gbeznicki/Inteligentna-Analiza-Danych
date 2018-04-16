@@ -10,6 +10,11 @@ public class Point {
         this.y = y;
     }
 
+    public Point(Point p){
+        this.x = p.getX();
+        this.y = p.getY();
+    }
+
     public Point(double x, double y, int group){
         this.x = x;
         this.y = y;
@@ -44,4 +49,14 @@ public class Point {
     public String toString(){
         return x+" "+y;
     }
+
+
+    public static double calculateDistanceBetweenPoints(Point p1, Point p2) {
+        double x1 = p1.getX();
+        double x2 = p2.getX();
+        double y1 = p1.getY();
+        double y2 = p2.getY();
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    }
+
 }

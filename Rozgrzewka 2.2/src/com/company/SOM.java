@@ -10,6 +10,9 @@ import static com.company.Point.calculateDistanceBetweenPoints;
 
 public class SOM {
 
+    private static final double PRECISION = 1e-3;
+    private static final double LEARNING_RATE_RATIO = 0.9;
+
     private List<Point> dataPoints;
     private List<Point> neurons;
     private List<Point> previousNeurons;
@@ -17,7 +20,6 @@ public class SOM {
     private double actualLearningRate;
     private NeighbourhoodFunction func;
     private int iteration = 1;
-    private double precision = 1e-5;
     private double actualError;
 
     public SOM(List<Point> dataPoints, List<Point> neurons, double initialLearningRate, NeighbourhoodFunction func) {
@@ -48,7 +50,8 @@ public class SOM {
     }
 
     public void updateLearningRate() {
-        actualLearningRate = initialLearningRate / iteration;
+//        actualLearningRate = initialLearningRate / iteration;
+        actualLearningRate *= LEARNING_RATE_RATIO;
     }
 
     public void iterate() {
@@ -74,7 +77,7 @@ public class SOM {
             double diffX = Math.abs(previousNeurons.get(i).getX() - neurons.get(i).getX());
             double diffY = Math.abs(previousNeurons.get(i).getY() - neurons.get(i).getY());
 
-            if (diffX > precision || diffY > precision) {
+            if (diffX > PRECISION || diffY > PRECISION) {
                 return false;
             }
         }

@@ -41,12 +41,12 @@ public class Main {
             neuronsList.add(pointFactory.generateRandomPoint(-10, 10, 0));
         }
 
-        SOM somWTA = new SOM(dataPoints, neuronsList, learningRate, new WinnerTakesAll());
-
-        somWTA.doSOM();
-
-//        SOM somWTM = new SOM(dataPoints, neuronsList, learningRate, new WinnerTakesMost(radius));
+//        SOM somWTA = new SOM(dataPoints, neuronsList, learningRate, new WinnerTakesAll());
 //
-//        somWTM.doSOM();
+//        somWTA.doSOM();
+
+        SOM somWTM = new SOM(dataPoints, neuronsList, learningRate, new WinnerTakesMost(radius));
+
+        somWTM.doSOM();
     }
 }

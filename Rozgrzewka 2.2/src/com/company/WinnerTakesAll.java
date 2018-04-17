@@ -5,8 +5,8 @@ import java.util.List;
 public class WinnerTakesAll implements NeighbourhoodFunction {
 
     @Override
-    public double calculateTheta(Point winningNeuron, Point currentNeuron, int iteration) {
-        if (winningNeuron == currentNeuron) {
+    public double calculateTheta(List<Point> neurons, int winningNeuronIndex,int currentNeuronIndex, int iteration) {
+        if (neurons.get(winningNeuronIndex) == neurons.get(currentNeuronIndex)) {
             return 1;
         } else return 0;
     }

@@ -6,7 +6,7 @@ public class KMeansAlgorithm {
 
     private List<Point> normalPoints;
     private List<Point> kPoints;
-    private double precision = 0.001;
+    private double precision = 1e-10;
     private double previousKError;
     private double actualKError;
 

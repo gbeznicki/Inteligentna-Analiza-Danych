@@ -11,7 +11,7 @@ public class Program {
         Point centre2 = new Point(3, 0);
 
         int quantity = 100;
-        int k = 10;
+        int k = 2;
 
 //        RandomPointGenerator randomPointGenerator = new RandomPointGenerator(quantity, centre1);
         PointFactory pointFactory = new PointFactory();
@@ -43,5 +43,13 @@ public class Program {
 
         kMeansAlgorithmDoer.runKMeansAlgorithm();
 
+        // zapisanie pozycji punktów z danymi do pliku
+        try (PrintWriter printWriter = new PrintWriter("blackPoints.txt")) {
+            for (int i = 0; i < normalPointList.size(); i++) {
+                printWriter.println(normalPointList.get(i));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

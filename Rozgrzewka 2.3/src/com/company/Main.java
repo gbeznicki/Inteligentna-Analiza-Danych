@@ -17,7 +17,7 @@ public class Main {
 //        RandomPointGenerator randomPointGenerator = new RandomPointGenerator(quantity, centre1);
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();
-        List<Point> neuronsList = new ArrayList<>();
+        List<Neuron> neuronsList = new ArrayList<>();
 
 
         //Losowanie 1 koła czarnych punktów
@@ -38,9 +38,11 @@ public class Main {
 
         //Losowanie neuronow
         for (int i = 0; i < k; i++) {
-            neuronsList.add(pointFactory.generateRandomPoint(-10, 10, 0));
+            neuronsList.add(pointFactory.generateRandomNeuron(-10, 10));
         }
 
+        SOM som = new SOM(dataPoints, neuronsList, learningRate);
+        som.doSOM();
 
     }
 }

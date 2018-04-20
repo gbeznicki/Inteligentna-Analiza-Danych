@@ -2,9 +2,7 @@ package com.company;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.company.Point.calculateDistanceBetweenPoints;
 
@@ -14,26 +12,29 @@ public class SOM {
     private static final double LEARNING_RATE_RATIO = 0.9;
 
     private List<Point> dataPoints;
-    private List<Point> neurons;
-    private List<Point> previousNeurons;
+    private List<Neuron> neurons;
+    private List<Neuron> previousNeurons;
     private double initialLearningRate;
     private double actualLearningRate;
     private int iteration = 1;
     private double actualError;
+    private NeuralGass neuralGass;
+    private int maxIteration = 100;
 
-    public SOM(List<Point> dataPoints, List<Point> neurons, double initialLearningRate) {
+    public SOM(List<Point> dataPoints, List<Neuron> neurons, double initialLearningRate) {
         this.dataPoints = dataPoints;
         this.neurons = neurons;
         this.initialLearningRate = initialLearningRate;
         actualLearningRate = initialLearningRate;
-        this.func = func;
+//        this.func = func;
         previousNeurons = new ArrayList<>();
         for (int i = 0; i < neurons.size(); i++) {
-            previousNeurons.add(new Point(neurons.get(i)));
+            previousNeurons.add(new Neuron(neurons.get(i)));
         }
+        neuralGass = new NeuralGass(10);
     }
 
-    public Point getBestMatchingUnit(Point dataPoint) {
+    public Neuron getBestMatchingUnit(Point dataPoint) {
         double min = Double.MAX_VALUE;
         int index = 0;
 
@@ -58,13 +59,33 @@ public class SOM {
 
         Point randomDataPoint = dataPoints.get(random.nextInt(dataPoints.size()));
 
-        Point bmu = getBestMatchingUnit(randomDataPoint);
+        Neuron bmu = getBestMatchingUnit(randomDataPoint);
+
+//        List<Point> pointList = new ArrayList<Point>(neurons);
+//        int indexOfBMU = pointList.indexOf(bmu);
+//
+//        List<NeuronsStructre> neuronsStructreList = new ArrayList<>();
+//
+//        for (int i = 0; i < neurons.size(); i++) {
+//            neuronsStructreList.add(new NeuronsStructre(i, calculateDistanceBetweenPoints(randomDataPoint, neurons.get(i))));
+//        }
+//
+//        Collections.sort(neuronsStructreList);
+//        System.out.println(neuronsStructreList);
 
         for (int i = 0; i < neurons.size(); i++) {
+            double distance = Neuron.calculateDistanceBetweenPoints(randomDataPoint, neurons.get(i));
+            neurons.get(i).setDistance(distance);
+        }
+
+        Collections.sort(neurons);
+
+        for (int i = 0; i < neurons.size(); i++) {
+
             double x = neurons.get(i).getX();
             double y = neurons.get(i).getY();
-            x += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getX() - bmu.getX());
-            y += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getY() - bmu.getY());
+            x += actualLearningRate * neuralGass.neighbourhoodFunc(neurons, neurons.indexOf(bmu),i, iteration, maxIteration) * (randomDataPoint.getX() - bmu.getX());
+            y += actualLearningRate * neuralGass.neighbourhoodFunc(neurons, neurons.indexOf(bmu),i, iteration, maxIteration) * (randomDataPoint.getY() - bmu.getY());
             neurons.get(i).setX(x);
             neurons.get(i).setY(y);
         }
@@ -87,14 +108,14 @@ public class SOM {
         previousNeurons.clear();
         for (int i = 0; i < neurons.size(); i++) {
 
-            previousNeurons.add(new Point(neurons.get(i)));
+            previousNeurons.add(new Neuron(neurons.get(i)));
         }
     }
 
     public void calculateError() {
         for (int i = 0; i < dataPoints.size(); i++) {
             Point dataPoint = dataPoints.get(i);
-            Point closestNeuron = getBestMatchingUnit(dataPoints.get(i));
+            Neuron closestNeuron = getBestMatchingUnit(dataPoints.get(i));
             actualError += calculateDistanceBetweenPoints(dataPoint, closestNeuron);
         }
         actualError /= dataPoints.size();
@@ -111,7 +132,7 @@ public class SOM {
             saveToFile(iteration);
 
             iteration++;
-        } while (!checkStopCondition());
+        } while (!checkStopCondition() && iteration < maxIteration);
 
         System.out.println(iteration);
     }

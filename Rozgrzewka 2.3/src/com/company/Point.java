@@ -59,4 +59,12 @@ public class Point {
         return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 
+    public static double calculateDistanceBetweenPoints(Point point, Neuron neuron) {
+        double x1 = point.getX();
+        double x2 = neuron.getX();
+        double y1 = point.getY();
+        double y2 = neuron.getY();
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    }
+
 }

@@ -38,11 +38,14 @@ public class Main {
 
         //Losowanie neuronow
         for (int i = 0; i < k; i++) {
-            neuronsList.add(pointFactory.generateRandomNeuron(-10, 10));
+            Point p = pointFactory.generateRandomPoint(-10, 10);
+            Neuron n = new Neuron(p.getX(), p.getY());
+            neuronsList.add(n);
         }
 
-        SOM som = new SOM(dataPoints, neuronsList, learningRate);
+        SOM som = new SOM(dataPoints, neuronsList);
         som.doSOM();
+
 
     }
 }

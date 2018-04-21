@@ -1,38 +1,40 @@
 package com.company;
 
-public class Neuron implements Comparable{
+public class Neuron implements Comparable<Neuron> {
     private double x;
     private double y;
-    private double distance = Double.MAX_VALUE;
+    private double distance;
 
     public Neuron(double x, double y) {
         this.x = x;
         this.y = y;
+        distance = Double.MAX_VALUE;
     }
 
-    public Neuron(Neuron n1){
-        this.x = n1.x;
-        this.y = n1.y;
+    public Neuron(Neuron n) {
+        this.x = n.x;
+        this.y = n.y;
+        distance = Double.MAX_VALUE;
     }
 
     public double getX() {
         return x;
     }
 
-    public double getY() {
-        return y;
-    }
-
-    public double getDistance() {
-        return distance;
-    }
-
     public void setX(double x) {
         this.x = x;
     }
 
+    public double getY() {
+        return y;
+    }
+
     public void setY(double y) {
         this.y = y;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 
     public void setDistance(double distance) {
@@ -40,21 +42,12 @@ public class Neuron implements Comparable{
     }
 
     @Override
-    public int compareTo(Object o) {
-        Neuron neuron = (Neuron) o;
-        return Double.compare(distance, neuron.distance);
-    }
-
-    public static double calculateDistanceBetweenPoints(Point point, Neuron neuron) {
-        double x1 = point.getX();
-        double x2 = neuron.getX();
-        double y1 = point.getY();
-        double y2 = neuron.getY();
-        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    public String toString() {
+        return x + " " + y;
     }
 
     @Override
-    public String toString() {
-        return x + " " + y;
+    public int compareTo(Neuron o) {
+        return Double.compare(distance, o.distance);
     }
 }

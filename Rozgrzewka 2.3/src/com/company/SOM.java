@@ -18,11 +18,10 @@ public class SOM {
     private List<Point> previousNeurons;
     private double initialLearningRate;
     private double actualLearningRate;
-    private NeighbourhoodFunction func;
     private int iteration = 1;
     private double actualError;
 
-    public SOM(List<Point> dataPoints, List<Point> neurons, double initialLearningRate, NeighbourhoodFunction func) {
+    public SOM(List<Point> dataPoints, List<Point> neurons, double initialLearningRate) {
         this.dataPoints = dataPoints;
         this.neurons = neurons;
         this.initialLearningRate = initialLearningRate;
@@ -64,8 +63,8 @@ public class SOM {
         for (int i = 0; i < neurons.size(); i++) {
             double x = neurons.get(i).getX();
             double y = neurons.get(i).getY();
-            x += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getX() - neurons.get(i).getX());
-            y += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getY() - neurons.get(i).getY());
+            x += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getX() - bmu.getX());
+            y += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getY() - bmu.getY());
             neurons.get(i).setX(x);
             neurons.get(i).setY(y);
         }
@@ -102,8 +101,6 @@ public class SOM {
     }
 
     public void doSOM() {
-        saveToFile(0);
-
         do {
             actualError = 0;
             updatePreviousNeurons();

@@ -2,6 +2,8 @@ package com.company;
 
 import java.util.List;
 
+import static com.company.Point.calculateDistanceBetweenPoints;
+
 public class WinnerTakesMost implements NeighbourhoodFunction {
 
     private double radius;
@@ -16,10 +18,8 @@ public class WinnerTakesMost implements NeighbourhoodFunction {
         // radius(t) = radius(0)*(1/t)
         double sigma = radius / iteration;
         double distance = Math.abs(winningNeuronIndex - currentNeuronIndex);
-        if (distance <= sigma) {
-            double output = Math.exp(-distance * distance / 2 * sigma * sigma);
+        double output = Math.exp(-(distance * distance) / (2 * sigma * sigma));
 
-            return output;
-        } else return 0;
+        return output;
     }
 }

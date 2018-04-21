@@ -130,7 +130,6 @@ public class SOM {
             calculateError();
             System.out.println(actualError);
             saveToFile(iteration);
-
             iteration++;
         } while (!checkStopCondition() && iteration < maxIteration);
 

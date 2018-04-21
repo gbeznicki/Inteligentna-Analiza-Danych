@@ -21,11 +21,11 @@ public class PointFactory {
         return new Point(x, y);
     }
 
-    public Point generateRandomPoint(double min, double max, int group) {
+    public Point generateRandomPoint(double min, double max) {
         double x = random.nextDouble() * (max - min) + min;
         double y = random.nextDouble() * (max - min) + min;
 
-        return new Point(x, y, group);
+        return new Point(x, y);
     }
 
 }

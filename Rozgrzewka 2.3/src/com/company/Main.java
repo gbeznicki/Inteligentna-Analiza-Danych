@@ -11,10 +11,7 @@ public class Main {
 
         int quantity = 100;
         int k = 10;
-        double learningRate = 0.8;
-        double radius = 10;
 
-//        RandomPointGenerator randomPointGenerator = new RandomPointGenerator(quantity, centre1);
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();
         List<Neuron> neuronsList = new ArrayList<>();
@@ -45,7 +42,5 @@ public class Main {
 
         SOM som = new SOM(dataPoints, neuronsList);
         som.doSOM();
-
-
     }
 }

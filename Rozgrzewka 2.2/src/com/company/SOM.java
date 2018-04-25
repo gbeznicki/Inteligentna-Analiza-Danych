@@ -64,8 +64,8 @@ public class SOM {
         for (int i = 0; i < neurons.size(); i++) {
             double x = neurons.get(i).getX();
             double y = neurons.get(i).getY();
-            x += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getX() - neurons.get(i).getX());
-            y += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu),i, iteration) * (randomDataPoint.getY() - neurons.get(i).getY());
+            x += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu), i, iteration) * (randomDataPoint.getX() - neurons.get(i).getX());
+            y += actualLearningRate * func.calculateTheta(neurons, neurons.indexOf(bmu), i, iteration) * (randomDataPoint.getY() - neurons.get(i).getY());
             neurons.get(i).setX(x);
             neurons.get(i).setY(y);
         }

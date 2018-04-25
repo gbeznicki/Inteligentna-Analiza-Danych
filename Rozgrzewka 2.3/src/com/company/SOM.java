@@ -10,7 +10,7 @@ import java.util.Random;
 public class SOM {
     private static final double PRECISION = 1e-3;
 
-    private static final double INITIAL_LEARNING_RATE = 0.5;
+    private static final double INITIAL_LEARNING_RATE = 0.2;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
@@ -74,6 +74,10 @@ public class SOM {
     }
 
     public void iterate() {
+        if (iteration % 15 == 0) {
+            Collections.shuffle(dataPoints);
+        }
+
         // wybierz losowy punkt z danymi
         Point randomDataPoint = dataPoints.get(random.nextInt(dataPoints.size()));
 
@@ -161,7 +165,7 @@ public class SOM {
         System.out.println(iteration);
     }
 
-    private void saveDataPointsToFile(){
+    private void saveDataPointsToFile() {
         try (PrintWriter printWriter = new PrintWriter("data.txt")) {
             for (int i = 0; i < dataPoints.size(); i++) {
                 printWriter.println(dataPoints.get(i));

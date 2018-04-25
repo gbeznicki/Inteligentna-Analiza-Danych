@@ -10,12 +10,12 @@ import java.util.Random;
 public class SOM {
     private static final double PRECISION = 1e-3;
 
-    private static final double INITIAL_LEARNING_RATE = 0.8;
-    private static final double MINIMAL_LEARNING_RATE = 0.0001;
+    private static final double INITIAL_LEARNING_RATE = 0.5;
+    private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.1;
-    private static final double MAX_ITERATIONS = 100;
+    private static final double MINIMAL_RADIUS = 0.5;
+    private static final double MAX_ITERATIONS = 500;
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
@@ -92,17 +92,19 @@ public class SOM {
 
         // zaktualizuj wagi neuronów zgodnie z algorytmem gazu neuronowego
         for (int i = 0; i < neurons.size(); i++) {
-            double previousX = neurons.get(i).getX();
-            double previousY = neurons.get(i).getY();
+            if (i <= actualRadius) {
+                double previousX = neurons.get(i).getX();
+                double previousY = neurons.get(i).getY();
 
-            double deltaX = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getX() - neurons.get(i).getX());
-            double deltaY = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getY() - neurons.get(i).getY());
+                double deltaX = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getX() - previousX);
+                double deltaY = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getY() - previousY);
 
-            double newX = previousX + deltaX;
-            double newY = previousY + deltaY;
+                double newX = previousX + deltaX;
+                double newY = previousY + deltaY;
 
-            neurons.get(i).setX(newX);
-            neurons.get(i).setY(newY);
+                neurons.get(i).setX(newX);
+                neurons.get(i).setY(newY);
+            }
         }
     }
 
@@ -139,8 +141,10 @@ public class SOM {
     public void doSOM() {
         iteration = 0;
 
+        saveDataPointsToFile();
+
         // zapis do pliku początkowych wag neuronów
-        saveToFile(iteration);
+        saveNeuronsToFile(iteration);
 
         do {
             actualError = 0;
@@ -151,13 +155,23 @@ public class SOM {
 
             iteration++;
             // zapis do pliku wag neuronów
-            saveToFile(iteration);
+            saveNeuronsToFile(iteration);
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
         System.out.println(iteration);
     }
 
-    private void saveToFile(int index) {
+    private void saveDataPointsToFile(){
+        try (PrintWriter printWriter = new PrintWriter("data.txt")) {
+            for (int i = 0; i < dataPoints.size(); i++) {
+                printWriter.println(dataPoints.get(i));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNeuronsToFile(int index) {
 
         try (PrintWriter printWriter = new PrintWriter("punkty" + index + ".txt")) {
             for (int i = 0; i < neurons.size(); i++) {

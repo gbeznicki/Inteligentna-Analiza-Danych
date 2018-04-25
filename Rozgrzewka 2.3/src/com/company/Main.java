@@ -21,16 +21,10 @@ public class Main {
         for (int i = 0; i < quantity; i++) {
             dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre1));
         }
-        for (int i = 0; i < dataPoints.size(); i++) {
-            System.out.println(dataPoints.get(i).getX() + " " + dataPoints.get(i).getY());
-        }
 
         //Losowanie 2 koła czarnych punktów
         for (int i = 0; i < quantity; i++) {
             dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre2));
-        }
-        for (int i = 0; i < dataPoints.size(); i++) {
-            System.out.println(dataPoints.get(i).getX() + " " + dataPoints.get(i).getY());
         }
 
         //Losowanie neuronow

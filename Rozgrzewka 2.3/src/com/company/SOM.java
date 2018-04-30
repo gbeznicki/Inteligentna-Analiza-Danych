@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-3;
+    private static final double PRECISION = 1e-10;
 
-    private static final double INITIAL_LEARNING_RATE = 0.2;
-    private static final double MINIMAL_LEARNING_RATE = 0.0001;
+    private static final double INITIAL_LEARNING_RATE = 0.5;
+    private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.1;
+    private static final double MINIMAL_RADIUS = 0.01;
     private static final double MAX_ITERATIONS = 500;
+    private static final int PUNISHMENT = 5;
+
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
@@ -94,9 +96,14 @@ public class SOM {
         updateLearningRate();
         updateRadius();
 
-        // zaktualizuj wagi neuronów zgodnie z algorytmem gazu neuronowego
+        //zdekrementuj karę
+        for(int i = 0; i<neurons.size(); i++){
+            neurons.get(i).decrementPunishment();
+        }
+
+        // zaktualizuj wagi neuronów zgodnie z algorytmem gazu neuronowego, dla uczonych neuronów ustaw karę
         for (int i = 0; i < neurons.size(); i++) {
-            if (i <= actualRadius) {
+            if (i <= actualRadius && neurons.get(i).getPunishment() == 0) {
                 double previousX = neurons.get(i).getX();
                 double previousY = neurons.get(i).getY();
 
@@ -108,6 +115,8 @@ public class SOM {
 
                 neurons.get(i).setX(newX);
                 neurons.get(i).setY(newY);
+
+                neurons.get(i).setPunishment(PUNISHMENT);
             }
         }
     }

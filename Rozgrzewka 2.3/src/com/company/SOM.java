@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-3;
+    private static final double PRECISION = 1e-10;
 
-    private static final double INITIAL_LEARNING_RATE = 0.2;
+    private static final double INITIAL_LEARNING_RATE = 0.5;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.5;
+    private static final double MINIMAL_RADIUS = 0.01;
     private static final double MAX_ITERATIONS = 500;
+    private static final int PUNISHMENT = 5;
+
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
@@ -74,11 +76,11 @@ public class SOM {
     }
 
     public void iterate() {
-        if (iteration % 15 == 0) {
+        // wybierz losowy punkt z danymi
+        if(iteration % 10 == 0){
             Collections.shuffle(dataPoints);
         }
 
-        // wybierz losowy punkt z danymi
         Point randomDataPoint = dataPoints.get(random.nextInt(dataPoints.size()));
 
         // oblicz odległości neuronów od tego punktu
@@ -94,9 +96,14 @@ public class SOM {
         updateLearningRate();
         updateRadius();
 
-        // zaktualizuj wagi neuronów zgodnie z algorytmem gazu neuronowego
+        //zdekrementuj karę
+        for(int i = 0; i<neurons.size(); i++){
+            neurons.get(i).decrementPunishment();
+        }
+
+        // zaktualizuj wagi neuronów zgodnie z algorytmem gazu neuronowego, dla uczonych neuronów ustaw karę
         for (int i = 0; i < neurons.size(); i++) {
-            if (i <= actualRadius) {
+            if (i <= actualRadius && neurons.get(i).getPunishment() == 0) {
                 double previousX = neurons.get(i).getX();
                 double previousY = neurons.get(i).getY();
 
@@ -108,6 +115,8 @@ public class SOM {
 
                 neurons.get(i).setX(newX);
                 neurons.get(i).setY(newY);
+
+                neurons.get(i).setPunishment(PUNISHMENT);
             }
         }
     }
@@ -163,9 +172,11 @@ public class SOM {
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
         System.out.println(iteration);
+
+        createGnuplotStript();
     }
 
-    private void saveDataPointsToFile() {
+    private void saveDataPointsToFile(){
         try (PrintWriter printWriter = new PrintWriter("data.txt")) {
             for (int i = 0; i < dataPoints.size(); i++) {
                 printWriter.println(dataPoints.get(i));
@@ -181,6 +192,21 @@ public class SOM {
             for (int i = 0; i < neurons.size(); i++) {
                 printWriter.println(neurons.get(i));
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createGnuplotStript(){
+        try (PrintWriter printWriter = new PrintWriter("script.gnu")){
+            printWriter.println("set key off");
+            printWriter.println("set xrange [-10:10]");
+            printWriter.println("set yrange [-10:10]");
+            printWriter.println("set size ratio -1");
+            printWriter.print("do for [i=0:"+ iteration +"] { set terminal png size 600,600;" +
+                    " set output sprintf('D:\\Pulpit\\output\\img%i.png', i); " +
+                    "plot 'D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\data.txt' pt 7 lc \"black\"," +
+                    "sprintf('D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\punkty%i.txt', i) pt 7 lc \"red\"}");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

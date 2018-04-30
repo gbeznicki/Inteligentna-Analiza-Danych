@@ -11,10 +11,10 @@ public class SOM {
     private static final double PRECISION = 1e-3;
 
     private static final double INITIAL_LEARNING_RATE = 0.2;
-    private static final double MINIMAL_LEARNING_RATE = 0.001;
+    private static final double MINIMAL_LEARNING_RATE = 0.0001;
 
     private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.5;
+    private static final double MINIMAL_RADIUS = 0.1;
     private static final double MAX_ITERATIONS = 500;
 
     private List<Point> dataPoints;
@@ -74,11 +74,11 @@ public class SOM {
     }
 
     public void iterate() {
-        if (iteration % 15 == 0) {
+        // wybierz losowy punkt z danymi
+        if(iteration % 10 == 0){
             Collections.shuffle(dataPoints);
         }
 
-        // wybierz losowy punkt z danymi
         Point randomDataPoint = dataPoints.get(random.nextInt(dataPoints.size()));
 
         // oblicz odległości neuronów od tego punktu
@@ -163,9 +163,11 @@ public class SOM {
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
         System.out.println(iteration);
+
+        createGnuplotStript();
     }
 
-    private void saveDataPointsToFile() {
+    private void saveDataPointsToFile(){
         try (PrintWriter printWriter = new PrintWriter("data.txt")) {
             for (int i = 0; i < dataPoints.size(); i++) {
                 printWriter.println(dataPoints.get(i));
@@ -181,6 +183,21 @@ public class SOM {
             for (int i = 0; i < neurons.size(); i++) {
                 printWriter.println(neurons.get(i));
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createGnuplotStript(){
+        try (PrintWriter printWriter = new PrintWriter("script.gnu")){
+            printWriter.println("set key off");
+            printWriter.println("set xrange [-10:10]");
+            printWriter.println("set yrange [-10:10]");
+            printWriter.println("set size ratio -1");
+            printWriter.print("do for [i=0:"+ iteration +"] { set terminal png size 600,600;" +
+                    " set output sprintf('D:\\Pulpit\\output\\img%i.png', i); " +
+                    "plot 'D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\data.txt' pt 7 lc \"black\"," +
+                    "sprintf('D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\punkty%i.txt', i) pt 7 lc \"red\"}");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

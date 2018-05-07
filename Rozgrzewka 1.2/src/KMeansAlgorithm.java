@@ -1,8 +1,10 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class KMeansAlgorithm {
+    private static final int NUMBER_OF_TRIES = 1000;
 
     private List<Point> normalPoints;
     private List<Point> kPoints;
@@ -10,7 +12,37 @@ public class KMeansAlgorithm {
     private double previousKError;
     private double actualKError;
 
-    public KMeansAlgorithm(List<Point> normalPoints, List<Point> kPoints) {
+    public KMeansAlgorithm(List<Point> normalPoints, int numberOfPoints, double min, double max) {
+        this.normalPoints = normalPoints;
+
+        // create k points
+        kPoints = new ArrayList<>();
+        List<Point> minKPoints = new ArrayList<>();
+        PointFactory pointFactory = new PointFactory();
+
+        double minError = Double.MAX_VALUE;
+
+        for (int i = 0; i < NUMBER_OF_TRIES; i++) {
+            kPoints.clear();
+
+            for (int j = 0; j < numberOfPoints; j++) {
+                kPoints.add(pointFactory.generateRandomPoint(min, max, 0));
+            }
+            assignToGroup();
+
+            double currentError = mediumKError();
+
+            if (currentError < minError) {
+                minError = currentError;
+                minKPoints = kPoints;
+            }
+
+        }
+
+        kPoints = minKPoints;
+    }
+
+    KMeansAlgorithm(List<Point> normalPoints, List<Point> kPoints) {
         this.normalPoints = normalPoints;
         this.kPoints = kPoints;
     }
@@ -77,14 +109,14 @@ public class KMeansAlgorithm {
         }
     }
 
-    // single algorithm iteration
     public void iterate() {
-
         //assigning normalPoints to groups
         assignToGroup();
+
         //calculate medium kError
         previousKError = actualKError;
         actualKError = mediumKError();
+
         //calculate centroids and update kPoints position
         updateKPointsPosition();
     }
@@ -96,16 +128,17 @@ public class KMeansAlgorithm {
     public void runKMeansAlgorithm() {
         actualKError = Double.MAX_VALUE;
         int i = 0;
+//        saveToFile(i);
         do {
             iterate();
-            saveToFile(i);
-            System.out.println(actualKError);
+//            saveToFile(i);
+
+//            System.out.println(actualKError);
             i++;
         } while (!shouldEnd());
     }
 
     private void saveToFile(int index) {
-
         try (PrintWriter printWriter = new PrintWriter("punkty" + index + ".txt")) {
             for (int i = 0; i < kPoints.size(); i++) {
                 printWriter.println(kPoints.get(i));
@@ -115,5 +148,26 @@ public class KMeansAlgorithm {
         }
     }
 
+    public double getActualKError() {
+        return actualKError;
+    }
 
+    public int getInactiveCentersNumber() {
+        int inactiveCenters = 0;
+
+        for (int i = 0; i < kPoints.size(); i++) {
+            int counter = 0;
+            for (int j = 0; j < normalPoints.size(); j++) {
+                Point normalPoint = normalPoints.get(j);
+                if (normalPoint.getGroup() == i) {
+                    counter++;
+                }
+            }
+            if (counter == 0) {
+                inactiveCenters++;
+            }
+        }
+
+        return inactiveCenters;
+    }
 }

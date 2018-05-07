@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-10;
+    private static final double PRECISION = 1e-3;
 
     private static final double INITIAL_LEARNING_RATE = 0.5;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.01;
-    private static final double MAX_ITERATIONS = 500;
+    private static final double MINIMAL_RADIUS = 0.1;
+    private static final double MAX_ITERATIONS = 1000;
     private static final int PUNISHMENT = 5;
 
 
@@ -116,9 +116,13 @@ public class SOM {
                 neurons.get(i).setX(newX);
                 neurons.get(i).setY(newY);
 
-                neurons.get(i).setPunishment(PUNISHMENT);
             }
         }
+
+        if(neurons.get(0).getPunishment() == 0){
+            neurons.get(0).setPunishment(PUNISHMENT);
+        }
+
     }
 
     public boolean checkStopCondition() {
@@ -131,6 +135,18 @@ public class SOM {
                 return false;
             }
         }
+
+        boolean punishmentFlag = true;
+        for (int j = 0; j < neurons.size() ; j++) {
+            if(neurons.get(j).getPunishment() == 0){
+                punishmentFlag = false;
+            }
+        }
+
+        if(punishmentFlag){
+            return false;
+        }
+
         return true;
     }
 

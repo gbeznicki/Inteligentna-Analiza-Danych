@@ -9,8 +9,8 @@ public class Main {
         Point centre1 = new Point(-3, 0);
         Point centre2 = new Point(3, 0);
 
-        int quantity = 100;
-        int k = 10;
+        int quantity = 500;
+        int k = 20;
 
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();

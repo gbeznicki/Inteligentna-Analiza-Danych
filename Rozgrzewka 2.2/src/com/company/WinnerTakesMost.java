@@ -2,8 +2,6 @@ package com.company;
 
 import java.util.List;
 
-import static com.company.Point.calculateDistanceBetweenPoints;
-
 public class WinnerTakesMost implements NeighbourhoodFunction {
 
     private double radius;

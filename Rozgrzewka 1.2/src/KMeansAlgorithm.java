@@ -1,10 +1,10 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class KMeansAlgorithm {
-    private static final int NUMBER_OF_TRIES = 1000;
+    private static final int NUMBER_OF_TRIES = 10000;
 
     private List<Point> normalPoints;
     private List<Point> kPoints;
@@ -128,23 +128,52 @@ public class KMeansAlgorithm {
     public void runKMeansAlgorithm() {
         actualKError = Double.MAX_VALUE;
         int i = 0;
-//        saveToFile(i);
+        saveToFile(i);
         do {
             iterate();
-//            saveToFile(i);
+            saveToFile(i);
 
-//            System.out.println(actualKError);
+            System.out.println(actualKError);
             i++;
         } while (!shouldEnd());
     }
 
+//    private void saveToFile(int index) {
+//        try (PrintWriter printWriter = new PrintWriter("punkty" + index + ".txt")) {
+//            for (int i = 0; i < kPoints.size(); i++) {
+//                printWriter.println(kPoints.get(i));
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void saveToFile(int index) {
-        try (PrintWriter printWriter = new PrintWriter("punkty" + index + ".txt")) {
+        try (FileWriter fw = new FileWriter("centra.txt", true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter printWriter = new PrintWriter(bw)) {
             for (int i = 0; i < kPoints.size(); i++) {
-                printWriter.println(kPoints.get(i));
+                printWriter.print(kPoints.get(i) + " ");
             }
+            printWriter.println("");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void savePointsWithGroups() {
+        for (int i = 0; i < kPoints.size(); i++) {
+            try (PrintWriter printWriter = new PrintWriter("group" + i + ".txt")) {
+                for (int j = 0; j < normalPoints.size(); j++) {
+                    if (normalPoints.get(j).getGroup() == i) {
+                        printWriter.println(normalPoints.get(j));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 

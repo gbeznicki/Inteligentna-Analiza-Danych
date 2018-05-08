@@ -9,23 +9,29 @@ import java.util.Random;
 
 public class SOM {
 
-    private static final double PRECISION = 1e-3;
+    private static final double PRECISION = 1e-5;
 
     private static final double INITIAL_LEARNING_RATE = 0.5;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
-    private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.1;
+    private static final double INITIAL_RADIUS = 2.0;
+    private static final double MINIMAL_RADIUS = 0.01;
 
     private static final double MAX_ITERATIONS = 1000;
 
-    private static final int PUNISHMENT = 5;
+    private static final int PUNISHMENT = 0;
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
     private List<Neuron> previousNeurons;
+    private List<Neuron> initialNeurons;
     private double actualLearningRate;
     private int iteration = 1;
+
+    public double getActualError() {
+        return actualError;
+    }
+
     private double actualError;
     private double actualRadius;
     private Random random;
@@ -42,6 +48,47 @@ public class SOM {
         for (int i = 0; i < neurons.size(); i++) {
             previousNeurons.add(new Neuron(neurons.get(i)));
         }
+    }
+
+    // TODO: 08.05.2018 implement constructor
+    public SOM(List<Point> dataPoints, int numberOfNeurons, double min, double max) {
+        this.dataPoints = dataPoints;
+        random = new Random();
+
+        actualLearningRate = INITIAL_LEARNING_RATE;
+        actualRadius = INITIAL_RADIUS;
+
+        //create neurons
+        neurons = new ArrayList<>();
+//        List<Neuron> minNeurons = new ArrayList<>();
+        PointFactory pointFactory = new PointFactory();
+
+//        double minError = Double.MAX_VALUE;
+
+            for (int j = 0; j < numberOfNeurons; j++) {
+                neurons.add(pointFactory.generateRandomNeuron(min, max));
+            }
+//            calculateError();
+//
+//            if (actualError < minError) {
+//                minError = actualError;
+//                minNeurons = neurons;
+//            }
+
+//        neurons = minNeurons;
+
+        initialNeurons = new ArrayList<>();
+        for (int i = 0; i<neurons.size(); i++){
+            initialNeurons.add(new Neuron(neurons.get(i)));
+        }
+
+        previousNeurons = new ArrayList<>();
+        for (int i = 0; i < neurons.size(); i++) {
+            previousNeurons.add(new Neuron(neurons.get(i)));
+        }
+
+//        initialNeurons = new ArrayList<>(neurons);
+//        previousNeurons = new ArrayList<>(neurons);
     }
 
     private double calculateDistance(Point p, Neuron n) {
@@ -139,26 +186,26 @@ public class SOM {
     public void doSOM() {
         iteration = 0;
 
-        saveDataPointsToFile();
+//        saveDataPointsToFile();
 
         // zapis do pliku początkowych wag neuronów
-        saveNeuronsToFile(iteration);
+//        saveNeuronsToFile(iteration);
 
         do {
             actualError = 0;
             updatePreviousNeurons();
             iterate();
             calculateError();
-            System.out.println(actualError);
+//            System.out.println(actualError);
 
             iteration++;
             // zapis do pliku wag neuronów
-            saveNeuronsToFile(iteration);
+//            saveNeuronsToFile(iteration);
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
-        System.out.println(iteration);
+//        System.out.println(iteration);
 
-        createGnuplotStript();
+//        createGnuplotStript();
     }
 
     public boolean checkStopCondition() {
@@ -237,5 +284,15 @@ public class SOM {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getInactiveNeuronsNumber() {
+        int inactiveNeurons = 0;
+        for (int i = 0; i < neurons.size(); i++) {
+            if (neurons.get(i).getX() == initialNeurons.get(i).getX() && neurons.get(i).getY() == initialNeurons.get(i).getY()){
+                inactiveNeurons++;
+            }
+        }
+        return inactiveNeurons;
     }
 }

@@ -28,13 +28,25 @@ public class Main {
         }
 
         //Losowanie neuronow
-        for (int i = 0; i < k; i++) {
-            Point p = pointFactory.generateRandomPoint(-10, 10);
-            Neuron n = new Neuron(p.getX(), p.getY());
-            neuronsList.add(n);
-        }
+//        for (int i = 0; i < k; i++) {
+//            Point p = pointFactory.generateRandomPoint(-10, 10);
+//            Neuron n = new Neuron(p.getX(), p.getY());
+//            neuronsList.add(n);
+//        }
+//
+//        SOM som = new SOM(dataPoints, neuronsList);
+//        som.doSOM();
+        int trials = 100;
+        double min = -10;
+        double max = 10;
 
-        SOM som = new SOM(dataPoints, neuronsList);
-        som.doSOM();
+        NeuralGassWrapper neuralGassWrapper = new NeuralGassWrapper(dataPoints, trials, k, min, max);
+        neuralGassWrapper.run();
+
+        System.out.println("średni błąd: " + neuralGassWrapper.calculateAverageError());
+        System.out.println("odchylenie błędu: " + neuralGassWrapper.calculateErrorDeviation());
+        System.out.println("minimalny błąd: " + neuralGassWrapper.getMinimumError());
+        System.out.println("średnia liczba nieaktywnych centrów: " + neuralGassWrapper.calculateAverageInactiveNeurons());
+        System.out.println("odchylenie nieaktywnych centrów: " + neuralGassWrapper.calculateInactiveNeuronsDeviation());
     }
 }

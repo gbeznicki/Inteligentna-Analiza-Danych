@@ -110,9 +110,9 @@ public class SOM {
 
                 double distance = neurons.get(i).getDistance();
 
-                double deltaX = actualLearningRate * Math.exp(-(distance*distance) / 2*actualRadius*actualRadius) *
+                double deltaX = actualLearningRate * Math.exp(-(distance*distance) / (2*actualRadius*actualRadius)) *
                         (randomDataPoint.getX() - previousX);
-                double deltaY = actualLearningRate * Math.exp(-(distance*distance) / 2*actualRadius*actualRadius) *
+                double deltaY = actualLearningRate * Math.exp(-(distance*distance) / (2*actualRadius*actualRadius)) *
                         (randomDataPoint.getY() - previousY);
 
                 double newX = previousX + deltaX;

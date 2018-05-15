@@ -11,7 +11,7 @@ import static com.company.Point.calculateDistanceBetweenPoints;
 public class SOM {
 
     private static final double PRECISION = 1e-3;
-    private static final double LEARNING_RATE_RATIO = 0.9;
+    private static final double LEARNING_RATE_RATIO = 0.8;
 
     private List<Point> dataPoints;
     private List<Point> neurons;
@@ -102,7 +102,7 @@ public class SOM {
     }
 
     public void doSOM() {
-        saveToFile(0);
+//        saveToFile(0);
 
         do {
             actualError = 0;
@@ -111,10 +111,12 @@ public class SOM {
             updateLearningRate();
             calculateError();
             System.out.println(actualError);
-            saveToFile(iteration);
+//            saveToFile(iteration);
 
             iteration++;
         } while (!checkStopCondition());
+
+        saveToFile(iteration);
 
         System.out.println(iteration);
     }
@@ -127,6 +129,21 @@ public class SOM {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void savePointGroups(){
+        for (int i = 0; i < neurons.size(); i++) {
+            try(PrintWriter writer = new PrintWriter("group"+i+".txt")){
+                // sprawdź które punkty mają ten neuron za najbliższy
+                for (int j = 0; j < dataPoints.size(); j++) {
+                    if (getBestMatchingUnit(dataPoints.get(j)) == neurons.get(i)){
+                        writer.println(dataPoints.get(j));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 

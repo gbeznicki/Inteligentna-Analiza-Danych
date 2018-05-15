@@ -28,11 +28,11 @@ public class PointFactory {
         return new Point(x, y);
     }
 
-    public Neuron generateRandomNeuron(double min, double max) {
+    public Neuron generateRandomNeuron(double min, double max, int id) {
         double x = random.nextDouble() * (max - min) + min;
         double y = random.nextDouble() * (max - min) + min;
 
-        return new Neuron(x, y);
+        return new Neuron(x, y, id);
     }
 
 }

@@ -15,12 +15,6 @@ public class Point {
         this.y = p.y;
     }
 
-    public Point(double x, double y, int group) {
-        this.x = x;
-        this.y = y;
-        this.group = group;
-    }
-
     public double getX() {
         return x;
     }

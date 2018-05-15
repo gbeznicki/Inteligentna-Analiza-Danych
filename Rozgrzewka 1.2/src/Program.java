@@ -5,7 +5,7 @@ import java.util.*;
 public class Program {
     public static void main(String[] args) {
         // generate training points
-        Point centre1 = new Point(-3, 0);
+        Point centre1 = new Point(0, 0);
         Point centre2 = new Point(3, 0);
 
         int numberOfPoints = 1000;

@@ -1,21 +1,20 @@
 package com.company;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-3;
+    private static final double PRECISION = 1e-4;
 
     private static final double INITIAL_LEARNING_RATE = 0.5;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
     private static final double MINIMAL_RADIUS = 0.1;
-    private static final double MAX_ITERATIONS = 1000;
+    private static final double MAX_ITERATIONS = 10000;
     private static final int PUNISHMENT = 5;
 
 
@@ -173,7 +172,7 @@ public class SOM {
         saveDataPointsToFile();
 
         // zapis do pliku początkowych wag neuronów
-        saveNeuronsToFile(iteration);
+//        saveNeuronsToFile(iteration);
 
         do {
             actualError = 0;
@@ -184,10 +183,13 @@ public class SOM {
 
             iteration++;
             // zapis do pliku wag neuronów
-            saveNeuronsToFile(iteration);
+//            saveNeuronsToFile(iteration);
+            saveToVoronoi();
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
         System.out.println(iteration);
+
+        saveNeuronsToFile(iteration);
 
         createGnuplotStript();
     }
@@ -209,6 +211,45 @@ public class SOM {
                 printWriter.println(neurons.get(i));
             }
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void savePointGroups(){
+        for (int i = 0; i < neurons.size(); i++) {
+            try(PrintWriter writer = new PrintWriter("group"+i+".txt")){
+                // sprawdź które punkty mają ten neuron za najbliższy
+                for (int j = 0; j < dataPoints.size(); j++) {
+                    int bmuIndex = getBestMatchingUnitIndex(dataPoints.get(j));
+                    if (neurons.get(bmuIndex) == neurons.get(i)){
+                        writer.println(dataPoints.get(j));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Neuron getNeuron(int id){
+        for (int i = 0; i < neurons.size(); i++) {
+            if(neurons.get(i).getId() == id) return neurons.get(i);
+        }
+        return null;
+    }
+
+    public void saveToVoronoi() {
+        try (FileWriter fw = new FileWriter("neurony.txt", true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter printWriter = new PrintWriter(bw)) {
+            for (int i = 0; i < neurons.size(); i++) {
+                Neuron n = getNeuron(i);
+                printWriter.print(n + " ");
+            }
+            printWriter.println("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

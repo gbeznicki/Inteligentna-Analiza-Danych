@@ -5,10 +5,12 @@ public class Neuron implements Comparable<Neuron> {
     private double y;
     private double distance;
     private int punishment;
+    private int id;
 
-    public Neuron(double x, double y) {
+    public Neuron(double x, double y, int id) {
         this.x = x;
         this.y = y;
+        this.id = id;
         distance = Double.MAX_VALUE;
         punishment = 0;
     }
@@ -46,6 +48,10 @@ public class Neuron implements Comparable<Neuron> {
 
     public void setPunishment(int punishment) {
         this.punishment = punishment;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public void decrementPunishment(){

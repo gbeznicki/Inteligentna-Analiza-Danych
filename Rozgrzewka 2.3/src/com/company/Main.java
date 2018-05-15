@@ -10,7 +10,7 @@ public class Main {
         Point centre2 = new Point(3, 0);
 
         int quantity = 500;
-        int k = 20;
+        int k = 10;
 
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();
@@ -23,18 +23,20 @@ public class Main {
         }
 
         //Losowanie 2 koła czarnych punktów
-        for (int i = 0; i < quantity; i++) {
-            dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre2));
-        }
+//        for (int i = 0; i < quantity; i++) {
+//            dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre2));
+//        }
 
         //Losowanie neuronow
         for (int i = 0; i < k; i++) {
             Point p = pointFactory.generateRandomPoint(-10, 10);
-            Neuron n = new Neuron(p.getX(), p.getY());
+            Neuron n = new Neuron(p.getX(), p.getY(), i);
             neuronsList.add(n);
         }
 
         SOM som = new SOM(dataPoints, neuronsList);
         som.doSOM();
+
+        som.savePointGroups();
     }
 }

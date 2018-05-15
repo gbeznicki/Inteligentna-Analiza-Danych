@@ -73,4 +73,10 @@ public class Neuron implements Comparable<Neuron> {
     public int compareTo(Neuron o) {
         return Double.compare(distance, o.distance);
     }
+
+    @Override
+    public boolean equals(Object o){
+        Neuron otherNeuron = (Neuron) o;
+        return this.x == otherNeuron.getX() && this.y == otherNeuron.getY();
+    }
 }

@@ -11,7 +11,7 @@ public class Main {
 
         int quantity = 250;
         int k = 10;
-        double learningRate = 0.8;
+        double learningRate = 0.5;
         double radius = 10;
 
 //        RandomPointGenerator randomPointGenerator = new RandomPointGenerator(quantity, centre1);

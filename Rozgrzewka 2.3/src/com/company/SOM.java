@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-4;
+    private static final double PRECISION = 1e-5;
 
-    private static final double INITIAL_LEARNING_RATE = 0.5;
+    private static final double INITIAL_LEARNING_RATE = 0.8;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;
     private static final double MINIMAL_RADIUS = 0.1;
-    private static final double MAX_ITERATIONS = 10000;
     private static final int PUNISHMENT = 5;
 
 
@@ -39,6 +38,40 @@ public class SOM {
         for (int i = 0; i < neurons.size(); i++) {
             previousNeurons.add(new Neuron(neurons.get(i)));
         }
+    }
+
+    public SOM(List<Point> dataPoints, int numberOfNeurons, double min, double max) {
+        this.dataPoints = dataPoints;
+        random = new Random();
+
+        actualLearningRate = INITIAL_LEARNING_RATE;
+        actualRadius = INITIAL_RADIUS;
+
+        //create neurons
+        neurons = new ArrayList<>();
+        PointFactory pointFactory = new PointFactory();
+
+        for (int j = 0; j < numberOfNeurons; j++) {
+            neurons.add(pointFactory.generateRandomNeuron(min, max));
+        }
+
+        //copy initial neurons values to initialNeurons List
+        initialNeurons = new ArrayList<>();
+        for (int i = 0; i < neurons.size(); i++) {
+            initialNeurons.add(new Neuron(neurons.get(i)));
+        }
+
+        previousNeurons = new ArrayList<>();
+        for (int i = 0; i < neurons.size(); i++) {
+            previousNeurons.add(new Neuron(neurons.get(i)));
+        }
+
+//        initialNeurons = new ArrayList<>(neurons);
+//        previousNeurons = new ArrayList<>(neurons);
+    }
+
+    public double getActualError() {
+        return actualError;
     }
 
     private double calculateDistance(Point p, Neuron n) {
@@ -267,6 +300,29 @@ public class SOM {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getInactiveNeuronsNumber() {
+        int inactiveNeurons = 0;
+        Neuron currentNeuron, initialNeuron;
+        double currentX, currentY, initialX, initialY;
+        for (int i = 0; i < neurons.size(); i++) {
+            currentNeuron = neurons.get(i);
+            currentX = currentNeuron.getX();
+            currentY = currentNeuron.getY();
+            for (int j = 0; j < initialNeurons.size(); j++) {
+                initialNeuron = initialNeurons.get(i);
+                initialX = initialNeuron.getX();
+                initialY = initialNeuron.getY();
+                if (currentX == initialX && currentY == initialY) {
+                    inactiveNeurons++;
+                }
+            }
+//            if (neurons.get(i).getX() == initialNeurons.get(i).getX() && neurons.get(i).getY() == initialNeurons.get(i).getY()) {
+//                inactiveNeurons++;
+//            }
+        }
+        return inactiveNeurons;
     }
 
 }

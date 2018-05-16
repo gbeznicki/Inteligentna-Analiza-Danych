@@ -14,7 +14,7 @@ public class WinnerTakesMost implements NeighbourhoodFunction {
     @Override
     public double calculateTheta(List<Point> neurons, int winningNeuronIndex, int currentNeuronIndex, int iteration) {
         // radius(t) = radius(0)*(1/t)
-        radius /= iteration;
+        radius /= iteration/10;
         double distance = Math.abs(winningNeuronIndex - currentNeuronIndex);
 
         if (distance < radius) {

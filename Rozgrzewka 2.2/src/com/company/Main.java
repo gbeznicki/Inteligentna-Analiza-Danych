@@ -9,7 +9,7 @@ public class Main {
         Point centre1 = new Point(-3, 0);
         Point centre2 = new Point(3, 0);
 
-        int quantity = 100;
+        int quantity = 250;
         int k = 10;
         double learningRate = 0.5;
         double radius = 10;
@@ -38,7 +38,7 @@ public class Main {
 
         //Losowanie neuronow
         for (int i = 0; i < k; i++) {
-            neuronsList.add(pointFactory.generateRandomPoint(-10, 10, 0));
+            neuronsList.add(pointFactory.generateRandomPoint(-10, 10));
         }
 
 //        SOM somWTA = new SOM(dataPoints, neuronsList, learningRate, new WinnerTakesAll());

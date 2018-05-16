@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KMeansAlgorithm {
-    private static final int NUMBER_OF_TRIES = 10000;
+    private static final int NUMBER_OF_TRIES = 1000;
 
     private List<Point> normalPoints;
     private List<Point> kPoints;
@@ -34,7 +34,7 @@ public class KMeansAlgorithm {
 
             if (currentError < minError) {
                 minError = currentError;
-                minKPoints = kPoints;
+                minKPoints = new ArrayList<>(kPoints);
             }
 
         }
@@ -133,7 +133,7 @@ public class KMeansAlgorithm {
             iterate();
             saveToFile(i);
 
-            System.out.println(actualKError);
+//            System.out.println(actualKError);
             i++;
         } while (!shouldEnd());
     }

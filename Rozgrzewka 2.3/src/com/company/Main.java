@@ -10,7 +10,7 @@ public class Main {
 //        Point centre2 = new Point(3, 0);
 
         int quantity = 500;
-        int k = 20;
+        int k = 10;
 
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();
@@ -22,10 +22,7 @@ public class Main {
             dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre1));
         }
 
-//        //Losowanie 2 koła czarnych punktów
-//        for (int i = 0; i < quantity; i++) {
-//            dataPoints.add(pointFactory.generatePointsInsideCircle(2, centre2));
-//        }
+
 
         //Losowanie neuronow
 //        for (int i = 0; i < k; i++) {
@@ -48,5 +45,7 @@ public class Main {
         System.out.println("minimalny błąd: " + neuralGassWrapper.getMinimumError());
         System.out.println("średnia liczba nieaktywnych centrów: " + neuralGassWrapper.calculateAverageInactiveNeurons());
         System.out.println("odchylenie nieaktywnych centrów: " + neuralGassWrapper.calculateInactiveNeuronsDeviation());
+
+        som.savePointGroups();
     }
 }

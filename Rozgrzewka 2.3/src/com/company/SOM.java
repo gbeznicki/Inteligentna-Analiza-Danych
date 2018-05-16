@@ -1,7 +1,6 @@
 package com.company;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,14 +14,12 @@ public class SOM {
 
     private static final double INITIAL_RADIUS = 10.0;
     private static final double MINIMAL_RADIUS = 0.1;
-    private static final double MAX_ITERATIONS = 1000;
     private static final int PUNISHMENT = 5;
 
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
     private List<Neuron> previousNeurons;
-    private List<Neuron> initialNeurons;
     private double actualLearningRate;
     private double actualRadius;
     private int iteration;
@@ -102,8 +99,7 @@ public class SOM {
 
     public void updateLearningRate() {
         double iterationRatio = iteration / MAX_ITERATIONS;
-        actualLearningRate = INITIAL_LEARNING_RATE *
-                Math.pow(MINIMAL_LEARNING_RATE / INITIAL_LEARNING_RATE, iterationRatio);
+        actualLearningRate = INITIAL_LEARNING_RATE * Math.pow(MINIMAL_LEARNING_RATE / INITIAL_LEARNING_RATE, iterationRatio);
     }
 
     public void updateRadius() {
@@ -113,7 +109,7 @@ public class SOM {
 
     public void iterate() {
         // wybierz losowy punkt z danymi
-        if (iteration % 10 == 0) {
+        if(iteration % 10 == 0){
             Collections.shuffle(dataPoints);
         }
 
@@ -133,7 +129,7 @@ public class SOM {
         updateRadius();
 
         //zdekrementuj karę
-        for (int i = 0; i < neurons.size(); i++) {
+        for(int i = 0; i<neurons.size(); i++){
             neurons.get(i).decrementPunishment();
         }
 
@@ -143,10 +139,8 @@ public class SOM {
                 double previousX = neurons.get(i).getX();
                 double previousY = neurons.get(i).getY();
 
-                double deltaX = actualLearningRate * Math.exp(-i / actualRadius) *
-                        (randomDataPoint.getX() - previousX);
-                double deltaY = actualLearningRate * Math.exp(-i / actualRadius) *
-                        (randomDataPoint.getY() - previousY);
+                double deltaX = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getX() - previousX);
+                double deltaY = actualLearningRate * Math.exp(-i / actualRadius) * (randomDataPoint.getY() - previousY);
 
                 double newX = previousX + deltaX;
                 double newY = previousY + deltaY;
@@ -157,7 +151,7 @@ public class SOM {
             }
         }
 
-        if (neurons.get(0).getPunishment() == 0) {
+        if(neurons.get(0).getPunishment() == 0){
             neurons.get(0).setPunishment(PUNISHMENT);
         }
 
@@ -175,13 +169,13 @@ public class SOM {
         }
 
         boolean punishmentFlag = true;
-        for (int j = 0; j < neurons.size(); j++) {
-            if (neurons.get(j).getPunishment() == 0) {
+        for (int j = 0; j < neurons.size() ; j++) {
+            if(neurons.get(j).getPunishment() == 0){
                 punishmentFlag = false;
             }
         }
 
-        if (punishmentFlag) {
+        if(punishmentFlag){
             return false;
         }
 
@@ -208,7 +202,7 @@ public class SOM {
     public void doSOM() {
         iteration = 0;
 
-//        saveDataPointsToFile();
+        saveDataPointsToFile();
 
         // zapis do pliku początkowych wag neuronów
 //        saveNeuronsToFile(iteration);
@@ -218,19 +212,22 @@ public class SOM {
             updatePreviousNeurons();
             iterate();
             calculateError();
-//            System.out.println(actualError);
+            System.out.println(actualError);
 
             iteration++;
             // zapis do pliku wag neuronów
 //            saveNeuronsToFile(iteration);
+            saveToVoronoi();
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
-//        System.out.println(iteration);
+        System.out.println(iteration);
 
-//        createGnuplotStript();
+        saveNeuronsToFile(iteration);
+
+        createGnuplotStript();
     }
 
-    private void saveDataPointsToFile() {
+    private void saveDataPointsToFile(){
         try (PrintWriter printWriter = new PrintWriter("data.txt")) {
             for (int i = 0; i < dataPoints.size(); i++) {
                 printWriter.println(dataPoints.get(i));
@@ -251,13 +248,52 @@ public class SOM {
         }
     }
 
-    public void createGnuplotStript() {
-        try (PrintWriter printWriter = new PrintWriter("script.gnu")) {
+    public void savePointGroups(){
+        for (int i = 0; i < neurons.size(); i++) {
+            try(PrintWriter writer = new PrintWriter("group"+i+".txt")){
+                // sprawdź które punkty mają ten neuron za najbliższy
+                for (int j = 0; j < dataPoints.size(); j++) {
+                    int bmuIndex = getBestMatchingUnitIndex(dataPoints.get(j));
+                    if (neurons.get(bmuIndex) == neurons.get(i)){
+                        writer.println(dataPoints.get(j));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Neuron getNeuron(int id){
+        for (int i = 0; i < neurons.size(); i++) {
+            if(neurons.get(i).getId() == id) return neurons.get(i);
+        }
+        return null;
+    }
+
+    public void saveToVoronoi() {
+        try (FileWriter fw = new FileWriter("neurony.txt", true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter printWriter = new PrintWriter(bw)) {
+            for (int i = 0; i < neurons.size(); i++) {
+                Neuron n = getNeuron(i);
+                printWriter.print(n + " ");
+            }
+            printWriter.println("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createGnuplotStript(){
+        try (PrintWriter printWriter = new PrintWriter("script.gnu")){
             printWriter.println("set key off");
             printWriter.println("set xrange [-10:10]");
             printWriter.println("set yrange [-10:10]");
             printWriter.println("set size ratio -1");
-            printWriter.print("do for [i=0:" + iteration + "] { set terminal png size 600,600;" +
+            printWriter.print("do for [i=0:"+ iteration +"] { set terminal png size 600,600;" +
                     " set output sprintf('D:\\Pulpit\\output\\img%i.png', i); " +
                     "plot 'D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\data.txt' pt 7 lc \"black\"," +
                     "sprintf('D:\\Studia\\IAD\\Repozytorium\\Rozgrzewka 2.3\\punkty%i.txt', i) pt 7 lc \"red\"}");

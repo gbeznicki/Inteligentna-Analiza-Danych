@@ -1,7 +1,6 @@
 package kohonen;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +16,7 @@ public class SOM {
     private static final double INITIAL_RADIUS = 2.0;
     private static final double MINIMAL_RADIUS = 0.01;
 
-    private static final double MAX_ITERATIONS = 1000;
+    private static final double MAX_ITERATIONS = 10000;
 
     private static final int PUNISHMENT = 0;
 
@@ -201,9 +200,11 @@ public class SOM {
             iteration++;
             // zapis do pliku wag neuronów
 //            saveNeuronsToFile(iteration);
+            saveToVoronoi();
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 
 //        System.out.println(iteration);
+        saveNeuronsToFile(iteration);
 
 //        createGnuplotStript();
     }
@@ -267,6 +268,45 @@ public class SOM {
                 printWriter.println(neurons.get(i));
             }
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void savePointGroups(){
+        for (int i = 0; i < neurons.size(); i++) {
+            try(PrintWriter writer = new PrintWriter("group"+i+".txt")){
+                // sprawdź które punkty mają ten neuron za najbliższy
+                for (int j = 0; j < dataPoints.size(); j++) {
+                    int bmuIndex = getBestMatchingUnitIndex(dataPoints.get(j));
+                    if (neurons.get(bmuIndex) == neurons.get(i)){
+                        writer.println(dataPoints.get(j));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Neuron getNeuron(int id){
+        for (int i = 0; i < neurons.size(); i++) {
+            if(neurons.get(i).getId() == id) return neurons.get(i);
+        }
+        return null;
+    }
+
+    public void saveToVoronoi() {
+        try (FileWriter fw = new FileWriter("neurony.txt", true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter printWriter = new PrintWriter(bw)) {
+            for (int i = 0; i < neurons.size(); i++) {
+                Neuron n = getNeuron(i);
+                printWriter.print(n + " ");
+            }
+            printWriter.println("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

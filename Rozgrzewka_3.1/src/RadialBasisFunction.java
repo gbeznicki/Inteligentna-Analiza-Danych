@@ -26,7 +26,8 @@ public class RadialBasisFunction {
 
         // sigmas
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = rand.nextDouble();
+//            sigmas[i] = rand.nextDouble();
+            sigmas[i] = 1.5;
         }
 
         // weights

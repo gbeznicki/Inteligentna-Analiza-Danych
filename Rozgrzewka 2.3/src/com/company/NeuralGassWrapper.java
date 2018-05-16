@@ -30,7 +30,7 @@ public class NeuralGassWrapper {
             errors[i] = som.getActualError();
             inactiveNeurons[i] = som.getInactiveNeuronsNumber();
 
-            System.out.println("Done " + (i + 1) + " trial");
+//            System.out.println("Done " + (i + 1) + " trial");
         }
     }
 

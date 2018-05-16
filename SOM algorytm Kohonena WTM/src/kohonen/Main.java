@@ -6,7 +6,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        Point centre1 = new Point(0, 0);
+        Point centre1 = new Point(-3, 0);
         Point centre2 = new Point(3, 0);
 
         int quantity = 500;

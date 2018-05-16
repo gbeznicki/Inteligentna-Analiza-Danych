@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-3;
+    private static final double PRECISION = 1e-5;
 
-    private static final double INITIAL_LEARNING_RATE = 0.5;
+    private static final double INITIAL_LEARNING_RATE = 0.8;
     private static final double MINIMAL_LEARNING_RATE = 0.001;
 
     private static final double INITIAL_RADIUS = 10.0;

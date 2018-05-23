@@ -3,20 +3,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InputReader {
-    private List<DataLine> dataLines;
+    private static final String SEPARATOR = " ";
+
+    private List<Point> trainingPoints;
     private File dataFile;
     private String fileName;
-    private int numberOfInputs;
-    private int numberOfOutputs;
-    private boolean bias;
 
-    public InputReader(String fileName, int numberOfInputs, int numberOfOutputs, boolean bias) {
+    public InputReader(String fileName) {
         dataFile = new File(fileName);
         this.fileName = fileName;
-        dataLines = new ArrayList<>();
-        this.numberOfInputs = numberOfInputs;
-        this.numberOfOutputs = numberOfOutputs;
-        this.bias = bias;
+        trainingPoints = new ArrayList<>();
     }
 
     public void read() {
@@ -24,7 +20,11 @@ public class InputReader {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    dataLines.add(new DataLine(line, numberOfInputs, numberOfOutputs, bias));
+                    String[] values = line.split(SEPARATOR);
+                    double x = Double.parseDouble(values[0]);
+                    double y = Double.parseDouble(values[1]);
+
+                    trainingPoints.add(new Point(x, y));
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -34,14 +34,7 @@ public class InputReader {
         }
     }
 
-    public void parseAllLines() {
-        for (DataLine dl : dataLines) {
-            dl.parseData();
-        }
+    public List<Point> getTrainingPoints() {
+        return trainingPoints;
     }
-
-    public List<DataLine> getDataLines() {
-        return dataLines;
-    }
-
 }

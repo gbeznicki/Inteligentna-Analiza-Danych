@@ -1,66 +1,66 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class RadialBasisFunction {
+    private static final double PRECISION = 0.01;
+    private static final double STOP = 1000000;
+
+    private List<Point> trainingPoints;
+
     private double[] centres;
     private double[] sigmas;
     private double[] weights;
-    private double[] weightDerivatives;
     private double learningRate;
-    private List<Double> desiredOutputs;
-    private List<Double> inputs;
-    private List<Double> outputs;
+    private double start;
+    private double end;
     private Random rand;
 
-    public RadialBasisFunction(int numberOfCentres, double learningRate, List<Double> desiredOutputs, List<Double> inputs) {
+    public RadialBasisFunction(double start, double end, int numberOfCentres, double learningRate, List<Point> trainingPoints) {
+        this.trainingPoints = trainingPoints;
         centres = new double[numberOfCentres];
         sigmas = new double[numberOfCentres];
         weights = new double[numberOfCentres + 1];
-        weightDerivatives = new double[weights.length];
         this.learningRate = learningRate;
-        this.desiredOutputs = desiredOutputs;
-        this.inputs = inputs;
+        this.start = start;
+        this.end = end;
         rand = new Random();
         initialize();
     }
 
     private void initialize() {
-        // centres [-4, 4]
+        // pozycje centrów ustalane są w taki sposób, aby podzielić badany przedział na równe części (z niewielkimi losowymi odchyleniami)
         for (int i = 0; i < centres.length; i++) {
-            centres[i] = -4 + (i + 1) * (8 / 11);
+            centres[i] = start + (i + 1) * Range.divide(start, end, centres.length) + (rand.nextDouble() * 0.2 - 0.1) * Range.length(start, end);
         }
 
-        // sigmas [1, 1.5]
+        // sigmy losowane zprzedziału [1, 1.5]
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = 1;
+            sigmas[i] = rand.nextDouble() * 0.5 + 1;
         }
 
-        // weights
+        // wagi losowane z przedziału [-1, 1]
         for (int i = 0; i < weights.length; i++) {
             weights[i] = rand.nextDouble() * 2 - 1;
         }
     }
 
-    private double calculateDistance(double x, double c) {
+    private double distance(double x, double c) {
         return Math.abs(x - c);
     }
 
-    private double calculateRadialFunction(double d, double sigma) {
+    private double radialFunction(double d, double sigma) {
         return (1 / (Math.sqrt(2 * Math.PI) * sigma)) * Math.exp(-(d * d) / (2 * sigma * sigma));
     }
 
-    private List<Point> calculatePointsForCentre(double start, double end, double step, int index) {
+    private List<Point> calculateFunctionForCentre(double step, int index) {
         double centre = centres[index];
         double sigma = sigmas[index];
         List<Point> results = new ArrayList<>();
 
         for (double x = start; x <= end; x += step) {
-            double d = calculateDistance(x, centre);
-            double k = calculateRadialFunction(d, sigma);
+            double d = distance(x, centre);
+            double k = radialFunction(d, sigma);
             double y = weights[index + 1] * k;
             results.add(new Point(x, y));
         }
@@ -68,14 +68,14 @@ public class RadialBasisFunction {
         return results;
     }
 
-    private List<Point> calculatePointsSum(double start, double end, double step) {
+    private List<Point> calculateFunction(double step) {
         List<Point> results = new ArrayList<>();
 
         for (double x = start; x <= end; x += step) {
             double sum = weights[0];
             for (int i = 0; i < centres.length; i++) {
-                double d = calculateDistance(x, centres[i]);
-                double k = calculateRadialFunction(d, sigmas[i]);
+                double d = distance(x, centres[i]);
+                double k = radialFunction(d, sigmas[i]);
                 sum += weights[i + 1] * k;
             }
 
@@ -95,68 +95,88 @@ public class RadialBasisFunction {
         }
     }
 
-    public void run(double start, double end, double step) {
-//        for (int i = 0; i < centres.length; i++) {
-//            List<Point> points = calculatePointsForCentre(start, end, step, i);
-//            savePointsToFile("centres" + i + ".txt", points);
-//        }
-
-
-        // punkty na początku
-        List<Point> sum = calculatePointsSum(start, end, step);
-        savePointsToFile("poczatek.txt", sum);
-
+    public void run(double step) {
         int i = 0;
         do {
-            System.out.println(calcQualityFunction());
-            calcPartialDerivative();
-            updateWeights();
+            doNextEpoch();
+            System.out.println(qualityFunction());
             i++;
-        } while (i < 100000);
+        } while (qualityFunction() > PRECISION && i < STOP);
 
-        // punkty na końcu
-        List<Point> sum2 = calculatePointsSum(start, end, step);
-        savePointsToFile("koniec.txt", sum2);
-    }
+        // zapisz funkcję realizowaną przez sieć
+        List<Point> function = calculateFunction(step);
+        savePointsToFile("function.txt", function);
 
-    private double calcQualityFunction() {
-        double quality = 0;
-        for (int i = 0; i < inputs.size(); i++) {
-            double output = calcOutput(inputs.get(i));
-            quality += (output - desiredOutputs.get(i)) * (output - desiredOutputs.get(i));
+        // zapisz funkcje realizowane przez poszczególne centra
+        for (i = 0; i < centres.length; i++) {
+            List<Point> points = calculateFunctionForCentre(step, i);
+            savePointsToFile("centres" + i + ".txt", points);
         }
-        quality /= 2 * inputs.size();
-        return quality;
     }
 
-    private void calcPartialDerivative() {
+    private void doIteration(Point point) {
+        double input = point.getX();
+        double output = generateOutput(input);
+        double desiredOutput = point.getY();
+        double[] previousWeights = Arrays.copyOf(weights, weights.length);
+        double[] partialDerivatives = new double[weights.length];
 
+        // oblicz pochodne cząstkowe
         for (int i = 0; i < weights.length; i++) {
-            double sum = 0;
-            for (int j = 0; j < inputs.size(); j++) {
-                sum += calcOutput(inputs.get(j)) - desiredOutputs.get(j);
+            double derivative;
+
+            if (i != 0) {
+                double d = distance(input, centres[i - 1]);
+                double sigma = sigmas[i - 1];
+                double k = radialFunction(d, sigma);
+                derivative = (output - desiredOutput) * k;
+            } else {
+                derivative = output - desiredOutput;
             }
-            if (i != 0) sum *= weights[i];
-            sum /= inputs.size();
-            weightDerivatives[i] = sum;
+
+            partialDerivatives[i] = derivative;
+        }
+
+        // zaktualizuj wagi
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = previousWeights[i] - learningRate * partialDerivatives[i];
+        }
+
+    }
+
+    private void doNextEpoch() {
+        // ustaw punkty treningowe w losowej kolejności
+        Collections.shuffle(trainingPoints);
+
+        for (int i = 0; i < trainingPoints.size(); i++) {
+            doIteration(trainingPoints.get(i));
         }
     }
 
-    private double calcOutput(double x) {
+    private double generateOutput(double x) {
         double output = weights[0];
+
         for (int i = 0; i < centres.length; i++) {
-            double d = Math.abs(x - centres[i]);
-            double k = calculateRadialFunction(d, sigmas[i]);
+            double d = distance(x, centres[i]);
+            double k = radialFunction(d, sigmas[i]);
             output += weights[i + 1] * k;
         }
+
         return output;
     }
 
-    private void updateWeights() {
-        double[] previousWeights = Arrays.copyOf(weights, weights.length);
-        for (int i = 0; i < weights.length; i++) {
-            weights[i] = previousWeights[i] - (learningRate * weightDerivatives[i]);
-        }
-    }
+    private double qualityFunction() {
+        double quality = 0;
 
+        for (int i = 0; i < trainingPoints.size(); i++) {
+            double input = trainingPoints.get(i).getX();
+            double output = generateOutput(input);
+            double desiredOutput = trainingPoints.get(i).getY();
+
+            quality += (output - desiredOutput) * (output - desiredOutput);
+        }
+        quality /= 2 * trainingPoints.size();
+
+        return quality;
+    }
 }

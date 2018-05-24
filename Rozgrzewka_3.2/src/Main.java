@@ -3,18 +3,24 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        String fileName = args[0];
-        int numberOfCentres = 10;
-        double learningRate = 0.0005;
-        InputReader reader = new InputReader(fileName);
-        reader.read();
-        reader.parseAllLines();
+        if (args.length == 3) {
+            String fileName = args[0];
+            int numberOfCentres = Integer.parseInt(args[1]);
+            double learningRate = Double.parseDouble(args[2]);
 
-        List<DataLine> dataLines = reader.getDataLines();
+            double step = 0.01;
 
+            InputReader reader = new InputReader(fileName);
+            reader.read();
 
+            List<Point> trainingPoints = reader.getTrainingPoints();
 
-        RadialBasisFunction function = new RadialBasisFunction(numberOfCentres, learningRate, reader.getDesiredOutputs(), reader.getInputs());
-	    function.run(-4, 4, 0.01);
+            double min = Range.findMin(trainingPoints);
+            double max = Range.findMax(trainingPoints);
+
+            RadialBasisFunction rbf = new RadialBasisFunction(min, max, numberOfCentres, learningRate, trainingPoints);
+
+            rbf.run(step);
+        }
     }
 }

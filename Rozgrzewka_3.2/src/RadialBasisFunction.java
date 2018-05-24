@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -8,12 +9,21 @@ public class RadialBasisFunction {
     private double[] centres;
     private double[] sigmas;
     private double[] weights;
+    private double[] weightDerivatives;
+    private double learningRate;
+    private List<Double> desiredOutputs;
+    private List<Double> inputs;
+    private List<Double> outputs;
     private Random rand;
 
-    public RadialBasisFunction(int numberOfCentres) {
+    public RadialBasisFunction(int numberOfCentres, double learningRate, List<Double> desiredOutputs, List<Double> inputs) {
         centres = new double[numberOfCentres];
         sigmas = new double[numberOfCentres];
         weights = new double[numberOfCentres + 1];
+        weightDerivatives = new double[weights.length];
+        this.learningRate = learningRate;
+        this.desiredOutputs = desiredOutputs;
+        this.inputs = inputs;
         rand = new Random();
         initialize();
     }
@@ -21,17 +31,17 @@ public class RadialBasisFunction {
     private void initialize() {
         // centres [-4, 4]
         for (int i = 0; i < centres.length; i++) {
-            centres[i] = rand.nextDouble() * 8 - 4;
+            centres[i] = -4 + (i + 1) * (8 / 11);
         }
 
         // sigmas [1, 1.5]
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = rand.nextDouble() * 0.5 + 1;
+            sigmas[i] = 1;
         }
 
         // weights
         for (int i = 0; i < weights.length; i++) {
-            weights[i] = rand.nextDouble() * 8 - 4;
+            weights[i] = rand.nextDouble() * 2 - 1;
         }
     }
 
@@ -86,12 +96,67 @@ public class RadialBasisFunction {
     }
 
     public void run(double start, double end, double step) {
-        for (int i = 0; i < centres.length; i++) {
-            List<Point> points = calculatePointsForCentre(start, end, step, i);
-            savePointsToFile("centres" + i + ".txt", points);
-        }
+//        for (int i = 0; i < centres.length; i++) {
+//            List<Point> points = calculatePointsForCentre(start, end, step, i);
+//            savePointsToFile("centres" + i + ".txt", points);
+//        }
 
+
+        // punkty na początku
         List<Point> sum = calculatePointsSum(start, end, step);
-        savePointsToFile("sum.txt", sum);
+        savePointsToFile("poczatek.txt", sum);
+
+        int i = 0;
+        do {
+            System.out.println(calcQualityFunction());
+            calcPartialDerivative();
+            updateWeights();
+            i++;
+        } while (i < 100000);
+
+        // punkty na końcu
+        List<Point> sum2 = calculatePointsSum(start, end, step);
+        savePointsToFile("koniec.txt", sum2);
     }
+
+    private double calcQualityFunction() {
+        double quality = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            double output = calcOutput(inputs.get(i));
+            quality += (output - desiredOutputs.get(i)) * (output - desiredOutputs.get(i));
+        }
+        quality /= 2 * inputs.size();
+        return quality;
+    }
+
+    private void calcPartialDerivative() {
+
+        for (int i = 0; i < weights.length; i++) {
+            double sum = 0;
+            for (int j = 0; j < inputs.size(); j++) {
+                sum += calcOutput(inputs.get(j)) - desiredOutputs.get(j);
+            }
+            if (i != 0) sum *= weights[i];
+            sum /= inputs.size();
+            weightDerivatives[i] = sum;
+        }
+    }
+
+    private double calcOutput(double x) {
+        double output = weights[0];
+        for (int i = 0; i < centres.length; i++) {
+            double d = Math.abs(x - centres[i]);
+            double k = calculateRadialFunction(d, sigmas[i]);
+            output += weights[i + 1] * k;
+        }
+        return output;
+    }
+
+    private void updateWeights() {
+        double[] previousWeights = Arrays.copyOf(weights, weights.length);
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = previousWeights[i] - (learningRate * weightDerivatives[i]);
+        }
+    }
+
 }

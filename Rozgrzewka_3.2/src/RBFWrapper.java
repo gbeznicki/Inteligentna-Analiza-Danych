@@ -4,12 +4,14 @@ import java.util.OptionalDouble;
 
 public class RBFWrapper {
     private List<Point> trainingPoints;
+    private List<Point> testPoints;
     private int numberOfTrials, numberOfCentres;
     private double[] trainingErrors;
     private double[] testErrors;
     private double learningRate;
 
-    public RBFWrapper(int numberOfCentres, double learningRate, List<Point> trainingPoints, int numberOfTrials) {
+    public RBFWrapper(int numberOfCentres, double learningRate, List<Point> trainingPoints, int numberOfTrials, List<Point> testPoints) {
+        this.testPoints = testPoints;
         this.trainingPoints = trainingPoints;
         this.numberOfTrials = numberOfTrials;
         this.numberOfCentres = numberOfCentres;
@@ -20,7 +22,7 @@ public class RBFWrapper {
 
     public void run() {
         for (int i = 0; i < numberOfTrials; i++) {
-            RadialBasisFunction rbf = new RadialBasisFunction(numberOfCentres, learningRate, trainingPoints);
+            RadialBasisFunction rbf = new RadialBasisFunction(numberOfCentres, learningRate, trainingPoints, testPoints);
             rbf.run();
 
             trainingErrors[i] = rbf.getFinalTrainingError();

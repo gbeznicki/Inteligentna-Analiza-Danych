@@ -7,6 +7,7 @@ public class RadialBasisFunction {
     private static final double STOP = 100000;
 
     private List<Point> trainingPoints;
+    private List<Point> testPoints;
 
     private double[] centres;
     private double[] sigmas;
@@ -19,7 +20,8 @@ public class RadialBasisFunction {
     private double finalTrainingError;
     private double finalTestError;
 
-    public RadialBasisFunction(double start, double end, int numberOfCentres, double learningRate, List<Point> trainingPoints) {
+    public RadialBasisFunction(double start, double end, int numberOfCentres, double learningRate, List<Point> trainingPoints, List<Point> testPoints) {
+        this.testPoints = testPoints;
         this.trainingPoints = trainingPoints;
         centres = new double[numberOfCentres];
         sigmas = new double[numberOfCentres];
@@ -31,7 +33,8 @@ public class RadialBasisFunction {
         initialize();
     }
 
-    public RadialBasisFunction(int numberOfCentres, double learningRate, List<Point> trainingPoints) {
+    public RadialBasisFunction(int numberOfCentres, double learningRate, List<Point> trainingPoints, List<Point> testPoints) {
+        this.testPoints = testPoints;
         this.trainingPoints = trainingPoints;
         centres = new double[numberOfCentres];
         sigmas = new double[numberOfCentres];
@@ -50,7 +53,7 @@ public class RadialBasisFunction {
 
         // sigmy losowane zprzedziału [1, 1.5]
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = 4;
+            sigmas[i] = 1.25;
         }
 
         // wagi losowane z przedziału [-1, 1]
@@ -134,11 +137,12 @@ public class RadialBasisFunction {
         int i = 0;
         do {
             doNextEpoch();
-            System.out.println(qualityFunction());
+//            System.out.println(qualityFunction());
             i++;
         } while (qualityFunction() > PRECISION && i < STOP);
 
         finalTrainingError = qualityFunction();
+        finalTestError = qualityFunctionTestPoints();
     }
 
     public double getFinalTrainingError() {
@@ -213,5 +217,20 @@ public class RadialBasisFunction {
         quality /= 2 * trainingPoints.size();
 
         return quality;
+    }
+
+    private double qualityFunctionTestPoints(){
+        double qualityTest = 0;
+
+        for (int i = 0; i < testPoints.size(); i++) {
+            double input = testPoints.get(i).getX();
+            double output = generateOutput(input);
+            double desiredOutput = testPoints.get(i).getY();
+
+            qualityTest += (output - desiredOutput) * (output - desiredOutput);
+        }
+        qualityTest /= 2 * testPoints.size();
+
+        return qualityTest;
     }
 }

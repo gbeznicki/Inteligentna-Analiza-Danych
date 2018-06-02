@@ -4,7 +4,7 @@ import java.util.*;
 
 public class RadialBasisFunction {
     private static final double PRECISION = 0.01;
-    private static final double STOP = 1000000;
+    private static final double STOP = 100000;
 
     private List<Point> trainingPoints;
 
@@ -31,12 +31,13 @@ public class RadialBasisFunction {
     private void initialize() {
         // pozycje centrów ustalane są w taki sposób, aby podzielić badany przedział na równe części (z niewielkimi losowymi odchyleniami)
         for (int i = 0; i < centres.length; i++) {
-            centres[i] = start + (i + 1) * Range.divide(start, end, centres.length) + (rand.nextDouble() * 0.2 - 0.1) * Range.length(start, end);
+            int randomIndex = rand.nextInt(trainingPoints.size());
+            centres[i] = trainingPoints.get(randomIndex).getX();
         }
 
         // sigmy losowane zprzedziału [1, 1.5]
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = rand.nextDouble() * 0.5 + 1;
+            sigmas[i] = 0.05;
         }
 
         // wagi losowane z przedziału [-1, 1]

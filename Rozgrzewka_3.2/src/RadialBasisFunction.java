@@ -16,6 +16,9 @@ public class RadialBasisFunction {
     private double end;
     private Random rand;
 
+    private double finalTrainingError;
+    private double finalTestError;
+
     public RadialBasisFunction(double start, double end, int numberOfCentres, double learningRate, List<Point> trainingPoints) {
         this.trainingPoints = trainingPoints;
         centres = new double[numberOfCentres];
@@ -24,6 +27,16 @@ public class RadialBasisFunction {
         this.learningRate = learningRate;
         this.start = start;
         this.end = end;
+        rand = new Random();
+        initialize();
+    }
+
+    public RadialBasisFunction(int numberOfCentres, double learningRate, List<Point> trainingPoints) {
+        this.trainingPoints = trainingPoints;
+        centres = new double[numberOfCentres];
+        sigmas = new double[numberOfCentres];
+        weights = new double[numberOfCentres + 1];
+        this.learningRate = learningRate;
         rand = new Random();
         initialize();
     }
@@ -37,7 +50,7 @@ public class RadialBasisFunction {
 
         // sigmy losowane zprzedziału [1, 1.5]
         for (int i = 0; i < sigmas.length; i++) {
-            sigmas[i] = 0.05;
+            sigmas[i] = 4;
         }
 
         // wagi losowane z przedziału [-1, 1]
@@ -58,6 +71,8 @@ public class RadialBasisFunction {
         double centre = centres[index];
         double sigma = sigmas[index];
         List<Point> results = new ArrayList<>();
+
+
 
         for (double x = start; x <= end; x += step) {
             double d = distance(x, centre);
@@ -113,6 +128,25 @@ public class RadialBasisFunction {
             List<Point> points = calculateFunctionForCentre(step, i);
             savePointsToFile("centres" + i + ".txt", points);
         }
+    }
+
+    public void run() {
+        int i = 0;
+        do {
+            doNextEpoch();
+            System.out.println(qualityFunction());
+            i++;
+        } while (qualityFunction() > PRECISION && i < STOP);
+
+        finalTrainingError = qualityFunction();
+    }
+
+    public double getFinalTrainingError() {
+        return finalTrainingError;
+    }
+
+    public double getFinalTestError() {
+        return finalTestError;
     }
 
     private void doIteration(Point point) {

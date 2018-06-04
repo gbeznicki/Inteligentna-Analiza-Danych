@@ -26,9 +26,9 @@ public class Main {
 
             RadialBasisFunction rbf = new RadialBasisFunction(min, max, numberOfCentres, learningRate, trainingPoints, testPoints);
 
-//            rbf.run(step);
-            RBFWrapper wrapper = new RBFWrapper(numberOfCentres, learningRate, trainingPoints, 100, testPoints);
-            wrapper.run();
+            rbf.run(step);
+//            RBFWrapper wrapper = new RBFWrapper(numberOfCentres, learningRate, trainingPoints, 100, testPoints);
+//            wrapper.run();
         }
     }
 }

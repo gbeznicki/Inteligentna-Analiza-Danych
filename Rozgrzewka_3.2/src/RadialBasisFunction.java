@@ -76,7 +76,6 @@ public class RadialBasisFunction {
         List<Point> results = new ArrayList<>();
 
 
-
         for (double x = start; x <= end; x += step) {
             double d = distance(x, centre);
             double k = radialFunction(d, sigma);
@@ -116,21 +115,43 @@ public class RadialBasisFunction {
 
     public void run(double step) {
         int i = 0;
+
+        List<Point> function = calculateFunction(step);
+        savePointsToFile("start.txt", function);
+
         do {
             doNextEpoch();
             System.out.println(qualityFunction());
+
+            if (i == 0.2 * STOP) {
+                function = calculateFunction(step);
+                savePointsToFile("1.txt", function);
+            }
+            if (i == 0.4 * STOP) {
+                function = calculateFunction(step);
+                savePointsToFile("2.txt", function);
+            }
+            if (i == 0.6 * STOP) {
+                function = calculateFunction(step);
+                savePointsToFile("3.txt", function);
+            }
+            if (i == 0.8 * STOP) {
+                function = calculateFunction(step);
+                savePointsToFile("4.txt", function);
+            }
+
             i++;
         } while (qualityFunction() > PRECISION && i < STOP);
 
         // zapisz funkcję realizowaną przez sieć
-        List<Point> function = calculateFunction(step);
-        savePointsToFile("function.txt", function);
+        function = calculateFunction(step);
+        savePointsToFile("end.txt", function);
 
         // zapisz funkcje realizowane przez poszczególne centra
-        for (i = 0; i < centres.length; i++) {
-            List<Point> points = calculateFunctionForCentre(step, i);
-            savePointsToFile("centres" + i + ".txt", points);
-        }
+//        for (i = 0; i < centres.length; i++) {
+//            List<Point> points = calculateFunctionForCentre(step, i);
+//            savePointsToFile("centres" + i + ".txt", points);
+//        }
     }
 
     public void run() {
@@ -219,7 +240,7 @@ public class RadialBasisFunction {
         return quality;
     }
 
-    private double qualityFunctionTestPoints(){
+    private double qualityFunctionTestPoints() {
         double qualityTest = 0;
 
         for (int i = 0; i < testPoints.size(); i++) {

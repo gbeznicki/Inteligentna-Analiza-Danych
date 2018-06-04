@@ -54,4 +54,8 @@ public class IdentityLayer {
             neuron.addDeltaWeights(i, partialDerivative);
         }
     }
+
+    public IdentityNeuron getNeuron() {
+        return neuron;
+    }
 }

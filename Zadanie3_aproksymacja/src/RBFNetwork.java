@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 public class RBFNetwork {
-    private static final double PRECISION = 0.01;
+    private static final double PRECISION = 0.001;
     private static final double STOP = 100000;
 
     private RadialLayer radialLayer;
@@ -72,9 +72,9 @@ public class RBFNetwork {
 
     public void saveFiles(String fileName, double start, double end, double step) {
         savePointsToFile(fileName, calculateFunction(start, end, step));
-//        for (int i = 0; i < radialLayer.getNeurons().length; i++) {
-//            savePointsToFile("centre" + i + ".txt", calculateRadialFunction(i, start, end, step));
-//        }
+        for (int i = 0; i < radialLayer.getNeurons().length; i++) {
+            savePointsToFile("centre" + i + ".txt", calculateRadialFunction(i, start, end, step));
+        }
     }
 
     private void savePointsToFile(String fileName, List<Point> points) {
@@ -87,18 +87,19 @@ public class RBFNetwork {
         }
     }
 
-//    private List<Point> calculateRadialFunction(int index, double start, double end, double step) {
-//        List<Point> points = new ArrayList<>();
-//        RadialNeuron radialNeuron = radialLayer.getNeurons()[index];
-//        for (double x = start; x <= end; x += step) {
-//            radialNeuron.feedData(x);
-//            radialNeuron.calcOutput();
-//            double output = radialNeuron.getOutput();
-//
-//            points.add(new Point(x, output));
-//        }
-//        return points;
-//    }
+    private List<Point> calculateRadialFunction(int index, double start, double end, double step) {
+        List<Point> points = new ArrayList<>();
+        RadialNeuron radialNeuron = radialLayer.getNeurons()[index];
+        double weight = identityLayer.getNeuron().getWeights()[index + 1];
+        for (double x = start; x <= end; x += step) {
+            radialNeuron.feedData(x);
+            radialNeuron.calcOutput();
+            double output = weight * radialNeuron.getOutput();
+
+            points.add(new Point(x, output));
+        }
+        return points;
+    }
 
     private List<Point> calculateFunction(double start, double end, double step) {
         List<Point> points = new ArrayList<>();

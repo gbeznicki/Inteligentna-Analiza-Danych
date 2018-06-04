@@ -69,4 +69,8 @@ public class IdentityNeuron {
     public void resetDeltaWeights() {
         Arrays.fill(deltaWeights, 0);
     }
+
+    public double[] getWeights() {
+        return weights;
+    }
 }

@@ -7,19 +7,21 @@ import java.util.List;
 import java.util.Random;
 
 public class SOM {
-    private static final double PRECISION = 1e-5;
+    private static final double PRECISION = 1e-3;
 
     private static final double INITIAL_LEARNING_RATE = 0.8;
-    private static final double MINIMAL_LEARNING_RATE = 0.001;
+    private static final double MINIMAL_LEARNING_RATE = 0.01;
 
     private static final double INITIAL_RADIUS = 10.0;
     private static final double MINIMAL_RADIUS = 0.1;
-    private static final int PUNISHMENT = 5;
+    private static final double MAX_ITERATIONS = 1000;
+    private static final int PUNISHMENT = 3;
 
 
     private List<Point> dataPoints;
     private List<Neuron> neurons;
     private List<Neuron> previousNeurons;
+    private List<Neuron> initialNeurons;
     private double actualLearningRate;
     private double actualRadius;
     private int iteration;
@@ -33,7 +35,7 @@ public class SOM {
 
         actualLearningRate = INITIAL_LEARNING_RATE;
         actualRadius = INITIAL_RADIUS;
-
+        initialNeurons = new ArrayList<>();
         previousNeurons = new ArrayList<>();
         for (int i = 0; i < neurons.size(); i++) {
             previousNeurons.add(new Neuron(neurons.get(i)));
@@ -52,7 +54,7 @@ public class SOM {
         PointFactory pointFactory = new PointFactory();
 
         for (int j = 0; j < numberOfNeurons; j++) {
-            neurons.add(pointFactory.generateRandomNeuron(min, max));
+            neurons.add(pointFactory.generateRandomNeuron(min, max, 0));
         }
 
         //copy initial neurons values to initialNeurons List
@@ -205,7 +207,7 @@ public class SOM {
         saveDataPointsToFile();
 
         // zapis do pliku początkowych wag neuronów
-//        saveNeuronsToFile(iteration);
+        saveNeuronsToFile(iteration);
 
         do {
             actualError = 0;
@@ -216,7 +218,7 @@ public class SOM {
 
             iteration++;
             // zapis do pliku wag neuronów
-//            saveNeuronsToFile(iteration);
+            saveNeuronsToFile(iteration);
             saveToVoronoi();
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 

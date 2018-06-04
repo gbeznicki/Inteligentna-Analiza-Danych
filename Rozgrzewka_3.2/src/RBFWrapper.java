@@ -31,10 +31,15 @@ public class RBFWrapper {
             System.out.println("Done " + (i + 1) + " trial");
         }
 
-        System.out.println("Błąd dla danych treningowych: ");
+        System.out.println("Odchylenie dla danych treningowych: ");
         System.out.println(calculateTrainingErrorDeviation());
-        System.out.println("Błąd dla danych testowych: ");
+        System.out.println("Błąd dla danych treningowych: ");
+        System.out.println(calculateAverageTrainingError());
+        System.out.println("Odchylenie dla danych testowych: ");
         System.out.println(calculateTestErrorDeviation());
+        System.out.println("Błąd dla danych testowych: ");
+        System.out.println(calculateAverageTestError());
+
     }
 
     public double calculateAverageTrainingError() {

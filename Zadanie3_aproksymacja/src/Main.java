@@ -18,9 +18,12 @@ public class Main {
             readerTest.read();
             List<Point> testPoints = readerTest.getTrainingPoints();
 
-            RBFNetwork network = new RBFNetwork(trainingPoints, testPoints, numberOfCentres, learningRate, sigma);
-            network.teach();
-            network.saveFiles("function.txt", -4, 4, 0.01);
+//            RBFNetwork network = new RBFNetwork(trainingPoints, testPoints, numberOfCentres, learningRate, sigma);
+//            network.teach();
+//            network.saveFiles("function.txt", -4, 4, 0.01);
+
+            RBFWrapper wrapper = new RBFWrapper(numberOfCentres, learningRate, trainingPoints, 10, testPoints, sigma);
+            wrapper.run();
         }
     }
 }

@@ -13,6 +13,33 @@ public class RBFNetwork {
     private int numberOfCentres;
     private List<Point> trainingPoints;
     private List<Point> testPoints;
+
+    public double getFinalTrainingError() {
+        return quality;
+    }
+
+    public double getFinalTestError(){
+        double error = 0;
+        for (int i = 0; i < testPoints.size(); i++) {
+            double testInput = testPoints.get(i).getX();
+            double desiredTrainingOutput = testPoints.get(i).getY();
+
+            // warstwa radialna
+            radialLayer.feedData(testInput);
+            radialLayer.calcOutputs();
+            double[] radialLayerOutputs = radialLayer.getOutputs();
+
+            // warstwa liniowa
+            identityLayer.feedData(radialLayerOutputs, desiredTrainingOutput);
+            identityLayer.calculateOutput();
+            double output = identityLayer.getOutput();
+
+            // obliczenie błędu w warstwie liniowej
+            error += 0.5 * (output - desiredTrainingOutput) * (output - desiredTrainingOutput);
+        }
+        return error/testPoints.size();
+        }
+
     private double quality;
 
     public RBFNetwork(List<Point> trainingPoints, List<Point> testPoints, int numberOfCentres, double learningRate, double sigma) {
@@ -35,21 +62,21 @@ public class RBFNetwork {
 
     private void iterate() {
         for (int i = 0; i < trainingPoints.size(); i++) {
-            double input = trainingPoints.get(i).getX();
-            double desiredOutput = trainingPoints.get(i).getY();
+            double trainingInput = trainingPoints.get(i).getX();
+            double desiredTrainingOutput = trainingPoints.get(i).getY();
 
             // warstwa radialna
-            radialLayer.feedData(input);
+            radialLayer.feedData(trainingInput);
             radialLayer.calcOutputs();
             double[] radialLayerOutputs = radialLayer.getOutputs();
 
             // warstwa liniowa
-            identityLayer.feedData(radialLayerOutputs, desiredOutput);
+            identityLayer.feedData(radialLayerOutputs, desiredTrainingOutput);
             identityLayer.calculateOutput();
             double output = identityLayer.getOutput();
 
             // obliczenie błędu w warstwie liniowej
-            quality += 0.5 * (output - desiredOutput) * (output - desiredOutput);
+            quality += 0.5 * (output - desiredTrainingOutput) * (output - desiredTrainingOutput);
 
             identityLayer.calculateError();
             identityLayer.calculatePartialDerivative();
@@ -65,7 +92,7 @@ public class RBFNetwork {
             quality = 0;
             iterate();
             quality /= trainingPoints.size();
-            System.out.println(quality);
+//            System.out.println(quality);
             i++;
         } while (i < STOP && quality > PRECISION);
     }

@@ -13,12 +13,24 @@ public class RBFNetwork {
     private int numberOfCentres;
     private List<Point> trainingPoints;
     private List<Point> testPoints;
+    private double quality;
+
+    private List<Double> error;
+
+    public RBFNetwork(List<Point> trainingPoints, List<Point> testPoints, int numberOfCentres, double learningRate, double sigma) {
+        this.numberOfCentres = numberOfCentres;
+        this.trainingPoints = trainingPoints;
+        this.testPoints = testPoints;
+        radialLayer = new RadialLayer(numberOfCentres, generateCentres(), sigma);
+        identityLayer = new IdentityLayer(numberOfCentres, learningRate);
+        error = new ArrayList<>();
+    }
 
     public double getFinalTrainingError() {
         return quality;
     }
 
-    public double getFinalTestError(){
+    public double getFinalTestError() {
         double error = 0;
         for (int i = 0; i < testPoints.size(); i++) {
             double testInput = testPoints.get(i).getX();
@@ -37,17 +49,7 @@ public class RBFNetwork {
             // obliczenie błędu w warstwie liniowej
             error += 0.5 * (output - desiredTrainingOutput) * (output - desiredTrainingOutput);
         }
-        return error/testPoints.size();
-        }
-
-    private double quality;
-
-    public RBFNetwork(List<Point> trainingPoints, List<Point> testPoints, int numberOfCentres, double learningRate, double sigma) {
-        this.numberOfCentres = numberOfCentres;
-        this.trainingPoints = trainingPoints;
-        this.testPoints = testPoints;
-        radialLayer = new RadialLayer(numberOfCentres, generateCentres(), sigma);
-        identityLayer = new IdentityLayer(numberOfCentres, learningRate);
+        return error / testPoints.size();
     }
 
     private double[] generateCentres() {
@@ -92,7 +94,8 @@ public class RBFNetwork {
             quality = 0;
             iterate();
             quality /= trainingPoints.size();
-//            System.out.println(quality);
+            error.add(quality);
+            System.out.println(quality);
             i++;
         } while (i < STOP && quality > PRECISION);
     }
@@ -143,5 +146,15 @@ public class RBFNetwork {
             points.add(new Point(x, output));
         }
         return points;
+    }
+
+    public void saveError() {
+        try (PrintWriter writer = new PrintWriter("error.txt")) {
+            for (int i = 0; i < error.size(); i++) {
+                writer.println(error.get(i));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

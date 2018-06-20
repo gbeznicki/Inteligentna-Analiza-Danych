@@ -46,6 +46,6 @@ public class Main {
         System.out.println("średnia liczba nieaktywnych centrów: " + kohonenWrapper.calculateAverageInactiveNeurons());
         System.out.println("odchylenie nieaktywnych centrów: " + kohonenWrapper.calculateInactiveNeuronsDeviation());
 
-        som.savePointGroups();
+//        som.savePointGroups();
     }
 }

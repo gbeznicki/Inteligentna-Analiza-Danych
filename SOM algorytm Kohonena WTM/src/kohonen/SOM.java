@@ -65,7 +65,7 @@ public class SOM {
 //        double minError = Double.MAX_VALUE;
 
             for (int j = 0; j < numberOfNeurons; j++) {
-                neurons.add(pointFactory.generateRandomNeuron(min, max));
+                neurons.add(pointFactory.generateRandomNeuron(min, max, j));
             }
 //            calculateError();
 //

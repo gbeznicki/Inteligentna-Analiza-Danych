@@ -5,6 +5,19 @@ public class RadialNeuron {
     private double centre;
     private double sigma;
 
+    // ustalenie sigmy
+    public RadialNeuron(double centre) {
+        this.centre = centre;
+    }
+
+    public void setSigma(double sigma) {
+        this.sigma = sigma;
+    }
+
+    public double getCentre() {
+        return centre;
+    }
+
     public RadialNeuron(double centre, double sigma) {
         this.centre = centre;
         this.sigma = sigma;

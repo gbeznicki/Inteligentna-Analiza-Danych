@@ -20,7 +20,7 @@ public class Main {
 
             RBFNetwork network = new RBFNetwork(trainingPoints, testPoints, numberOfCentres, learningRate, sigma);
             network.teach();
-//            network.saveFiles("function.txt", -4, 4, 0.01);
+            network.saveFiles("function.txt", -4, 4, 0.01);
             network.saveError();
 
 //            RBFWrapper wrapper = new RBFWrapper(numberOfCentres, learningRate, trainingPoints, 10, testPoints, sigma);

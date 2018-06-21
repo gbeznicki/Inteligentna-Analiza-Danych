@@ -40,7 +40,7 @@ public class RadialNeuron {
         return Math.abs(centre - input);
     }
 
-    private double radialFunction(double d) {
+    public double radialFunction(double d) {
         return (1 / (Math.sqrt(2 * Math.PI) * sigma)) * Math.exp(-(d * d) / (2 * sigma * sigma));
     }
 

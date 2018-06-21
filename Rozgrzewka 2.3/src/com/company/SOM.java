@@ -12,10 +12,10 @@ public class SOM {
     private static final double INITIAL_LEARNING_RATE = 0.8;
     private static final double MINIMAL_LEARNING_RATE = 0.01;
 
-    private static final double INITIAL_RADIUS = 10.0;
-    private static final double MINIMAL_RADIUS = 0.1;
-    private static final double MAX_ITERATIONS = 1000;
-    private static final int PUNISHMENT = 3;
+    private static final double INITIAL_RADIUS = 2.0;
+    private static final double MINIMAL_RADIUS = 0.01;
+    private static final double MAX_ITERATIONS = 10000;
+    private static final int PUNISHMENT = 5;
 
 
     private List<Point> dataPoints;
@@ -218,7 +218,7 @@ public class SOM {
 
             iteration++;
             // zapis do pliku wag neuronów
-            saveNeuronsToFile(iteration);
+//            saveNeuronsToFile(iteration);
             saveToVoronoi();
         } while (!checkStopCondition() && iteration < MAX_ITERATIONS);
 

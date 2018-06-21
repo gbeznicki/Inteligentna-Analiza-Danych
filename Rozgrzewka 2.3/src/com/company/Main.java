@@ -10,7 +10,7 @@ public class Main {
         Point centre2 = new Point(3, 0);
 
         int quantity = 500;
-        int k = 10;
+        int k = 2;
 
         PointFactory pointFactory = new PointFactory();
         List<Point> dataPoints = new ArrayList<>();
@@ -35,8 +35,9 @@ public class Main {
             neuronsList.add(n);
         }
 
-        SOM som = new SOM(dataPoints, neuronsList);
+        SOM som = new SOM(dataPoints, 2, -10, 10);
         som.doSOM();
+        som.savePointGroups();
 //        int trials = 100;
 //        double min = -10;
 //        double max = 10;

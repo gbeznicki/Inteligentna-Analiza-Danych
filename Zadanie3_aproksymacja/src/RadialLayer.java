@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class RadialLayer {
     private RadialNeuron[] neurons;
     private double[] outputs;
@@ -22,13 +24,23 @@ public class RadialLayer {
     }
 
     private void initializeSigmas() {
-        for (RadialNeuron neuron : neurons) {
-            RadialNeuron closestNeuron = getClosestRadialNeuron(neuron);
-            double x1 = neuron.getCentre();
-            double x2 = closestNeuron.getCentre();
-            double sigma = distance(x1, x2) / 2.0;
-            neuron.setSigma(sigma);
+        Random rand = new Random();
+
+        if (neurons.length !=1){
+            for (RadialNeuron neuron : neurons) {
+                RadialNeuron closestNeuron = getClosestRadialNeuron(neuron);
+                double x1 = neuron.getCentre();
+                double x2 = closestNeuron.getCentre();
+                double maxGauss = neuron.radialFunction(0);
+
+                for (int i = 0; i < 100000; i++) {
+                    neuron.setSigma(5.0 * rand.nextDouble());
+                    double halfGauss = neuron.radialFunction(distance(x1, x2) / 2.0);
+                    if (halfGauss >= 0.45 * maxGauss && halfGauss <= 0.55 * maxGauss) break;
+                }
+            }
         }
+        else neurons[0].setSigma(1.0);
     }
 
     private double distance(double x1, double x2) {
